@@ -1,7 +1,7 @@
-defrecord Switchboard.Plug.Fun, function_name: nil, module: nil, args: [] do
+defrecord Switchboard.Plug.Fun, func: nil, module: nil, args: [] do
   def call(context, plug) do
     apply( plug.module, 
-           plug.function_name, 
+           plug.func, 
            ([context] ++ plug.args))
   end
 end

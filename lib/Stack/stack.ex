@@ -40,6 +40,9 @@ defrecord Switchboard.Stack, name: nil, plugs: [], handlers: [] do
   defp _call({:halt, context}, _, _), do: {:halt, context}
   defp _call(result, _, stack), do: stack.handle(result)
 
+  @doc """
+  Handles return codes other than {:ok, _} and {:halt, _}
+  """
   def handle({code, context}, stack) do
     handler = Keyword.get stack.handlers, code
     _handle code, context, handler
