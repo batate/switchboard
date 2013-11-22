@@ -1,4 +1,3 @@
-switchboard
-===========
+# Switchboard
 
-Elixir framework for composing functions
+Switchboard is a framework for composing with plugs. 
