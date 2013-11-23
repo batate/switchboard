@@ -29,6 +29,9 @@ defmodule SwitchboardTest do
 
   test "should call plug with module", 
     do: assert( double_plug.call(1) == {:ok, 2})
+    
+  test "should name module", 
+    do: assert( "with_plugs" == module_plug.name)
   
   test "should halt stack",
     do: assert( halt_stack.call(0) == {:halt, 1} )
