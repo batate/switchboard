@@ -1,8 +1,13 @@
-defrecord Switchboard.Stack, name: nil, plugs: [], handlers: [], strategy: Switchboard.Strategy.ForwardOther do
+defrecord Switchboard.Stack, name: nil, 
+                             plugs: [], 
+                             handlers: [], 
+                             strategy: Switchboard.Strategy.ForwardOther, 
+                             meta: [] do
   @type name              :: atom
   @type plugs             :: [ Switchboard.Plug ]
-  @type handlers          :: [ {atom, module} ]
+  @type handlers          :: Keyword.t
   @type strategy          :: Switchboard.Strategy
+  @type meta              :: Keyword.t
   
   @moduledoc """
   Stacks
@@ -31,7 +36,8 @@ defrecord Switchboard.Stack, name: nil, plugs: [], handlers: [], strategy: Switc
     Switchboard.Stack.new name: stack.name, 
                           plugs: stack.plugs ++ [plug], 
                           handlers: stack.handlers, 
-                          strategy: stack.strategy
+                          strategy: stack.strategy, 
+                          meta: stack.meta
   end
   
   
@@ -42,8 +48,9 @@ defrecord Switchboard.Stack, name: nil, plugs: [], handlers: [], strategy: Switc
     if handler.name == nil, do: raise "A stack must have a name to be a handler"
     Switchboard.Stack.new name: stack.name, 
                           plugs: stack.plugs, 
-                          handlers: stack.handlers ++ [{binary_to_atom( handler.name ), handler}], 
-                          strategy: stack.strategy
+                          handlers: (stack.handlers |> Keyword.put(binary_to_atom( handler.name ), handler)), 
+                          strategy: stack.strategy, 
+                          meta: stack.meta
                           
   end
   
@@ -51,11 +58,17 @@ defrecord Switchboard.Stack, name: nil, plugs: [], handlers: [], strategy: Switc
     Switchboard.Stack.new name: stack.name, 
                           plugs: stack.plugs, 
                           handlers: stack.handlers, 
-                          strategy: strategy
+                          strategy: stack.strategy, 
+                          meta: stack.meta
   end
   
-
-
+  def add_meta(key, value, stack) do
+    Switchboard.Stack.new name: stack.name, 
+                          plugs: stack.plugs, 
+                          handlers: stack.handlers, 
+                          strategy: stack.strategy, 
+                          meta: (stack.meta |> Keyword.put(key, value) )
+  end
   
-  
+  def metadata(key, stack), do: Keyword.get(stack.meta, key)
 end

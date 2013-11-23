@@ -15,10 +15,13 @@ defmodule Switchboard.Strategy.ForwardOther do
   where plug2 returns {:halt, context}. In this case, invoking the 
   stack would give you the composition:
   
-  context |> plug1 |> plug 2
+  context |> plug1 |> plug2
+  
+  The traversal will pass non-:ok results through, unless the stack encounters a halt. 
   
   """
   def call(context, stack), do: _call({:ok, context}, stack.plugs, stack)
+  def call({code, context}, stack), do: _call({code, context}, stack.plugs, stack)
 
   defp _call({:ok, context}, [plug|tail], stack) do
     _call(plug.call(context), tail, stack) 

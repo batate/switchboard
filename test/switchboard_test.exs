@@ -36,5 +36,10 @@ defmodule SwitchboardTest do
     assert (added.handlers |> Enum.count) == 1
     assert Keyword.get( added.handlers, :double ).name == "double"
   end
+
+  test "should add meta" do
+    added = stack.add_meta(:key, "value")
+    assert (added.metadata(:key)) == "value"
+  end
     
 end
