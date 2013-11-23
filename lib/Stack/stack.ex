@@ -1,4 +1,4 @@
-defrecord Switchboard.Stack, name: nil, plugs: [], handlers: [], strategy: nil do
+defrecord Switchboard.Stack, name: nil, plugs: [], handlers: [], strategy: Switchboard.Strategy.ForwardOther do
   @type name              :: atom
   @type plugs             :: [ Switchboard.Plug ]
   @type handlers          :: [ {atom, module} ]
@@ -17,17 +17,12 @@ defrecord Switchboard.Stack, name: nil, plugs: [], handlers: [], strategy: nil d
   @doc """
   Call the stack with the associated strategy. 
   """
-  def call(context, stack), do: stack.strategy_or_default.call(context, stack)
+  def call(context, stack), do: stack.strategy.call(context, stack)
 
   @doc """
   Call the stack with the associated strategy. 
   """
-  def handle(context, stack), do: stack.strategy_or_default.handle(context, stack)
-
-
-
-  def strategy_or_default(stack), do: stack.strategy || Switchboard.Strategy.ForwardOther
-  
+  def handle(context, stack), do: stack.strategy.handle(context, stack)
 
   @doc """
   Returns a new stack with a plug appended to the end of plugs.
@@ -35,7 +30,8 @@ defrecord Switchboard.Stack, name: nil, plugs: [], handlers: [], strategy: nil d
   def add_plug(plug, stack) do
     Switchboard.Stack.new name: stack.name, 
                           plugs: stack.plugs ++ [plug], 
-                          handlers: stack.handlers
+                          handlers: stack.handlers, 
+                          strategy: stack.strategy
   end
   
   
@@ -46,8 +42,18 @@ defrecord Switchboard.Stack, name: nil, plugs: [], handlers: [], strategy: nil d
     if handler.name == nil, do: raise "A stack must have a name to be a handler"
     Switchboard.Stack.new name: stack.name, 
                           plugs: stack.plugs, 
-                          handlers: stack.handlers ++ [{binary_to_atom( handler.name ), handler}]
+                          handlers: stack.handlers ++ [{binary_to_atom( handler.name ), handler}], 
+                          strategy: stack.strategy
+                          
   end
+  
+  def set_strategy(strategy, stack) do
+    Switchboard.Stack.new name: stack.name, 
+                          plugs: stack.plugs, 
+                          handlers: stack.handlers, 
+                          strategy: strategy
+  end
+  
 
 
   
