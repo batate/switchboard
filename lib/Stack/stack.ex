@@ -1,7 +1,6 @@
 defrecord Switchboard.Stack, name: nil, 
                              plugs: [], 
                              handlers: [], 
-                             strategy: Switchboard.Strategy.ForwardOther, 
                              meta: [] do
   @type name              :: atom
   @type plugs             :: [ Switchboard.Plug ]
@@ -54,13 +53,8 @@ defrecord Switchboard.Stack, name: nil,
                           
   end
   
-  def set_strategy(strategy, stack) do
-    Switchboard.Stack.new name: stack.name, 
-                          plugs: stack.plugs, 
-                          handlers: stack.handlers, 
-                          strategy: stack.strategy, 
-                          meta: stack.meta
-  end
+  def set_strategy(strategy, stack), do: stack.add_meta(:strategy, strategy)
+  def strategy(stack), do: stack.metadata(:strategy) || Switchboard.Strategy.ForwardOther
   
   def add_meta(key, value, stack) do
     Switchboard.Stack.new name: stack.name, 
