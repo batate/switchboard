@@ -5,7 +5,7 @@ defmodule SwitchboardTest do
   def inc(int), do: {:ok, int + 1}
   def double(int), do: {:ok, int * 2}
 
-  def simple_plug, do: Switchboard.Plug.Fun.new func: :inc, module: __MODULE__
+  def simple_plug, do: Switchboard.Plug.Anon.new func: &({:ok, &1 + 1})
   def double_plug, do: Switchboard.Plug.Fun.new func: :double, module: __MODULE__
 
   def stack, do: Switchboard.Stack.new plugs: [simple_plug, double_plug, double_plug]
@@ -40,6 +40,14 @@ defmodule SwitchboardTest do
   test "should add meta" do
     added = stack.add_meta(:key, "value")
     assert (added.metadata(:key)) == "value"
+  end
+  
+  test "should set context" do
+    context = Context.new assigns: [color: :red]
+    assert context.get(:color) == :red
+    
+    context = context.assign :color, :blue
+    assert context.get(:color) == :blue
   end
     
 end
