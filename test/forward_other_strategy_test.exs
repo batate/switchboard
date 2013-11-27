@@ -35,6 +35,4 @@ defmodule ForwardOtherStrategyTest do
     
   test "should handle tuple", 
     do: assert( stack_with_handler.handle({:double, 1}) == {:ok, 2})
-  
-  
 end

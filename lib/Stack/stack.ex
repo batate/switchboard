@@ -3,7 +3,7 @@ defrecord Switchboard.Stack, name: nil,
                              handlers: [], 
                              registered_plugs: [], 
                              strategy: Switchboard.Strategy.ForwardOther,
-                             parent: Switchboard.Stack,
+                             parent: nil,
                              meta: Keyword.new do
   @type name              :: atom
   @type plugs             :: [ Switchboard.Plug ]
@@ -58,13 +58,18 @@ defrecord Switchboard.Stack, name: nil,
   @doc """
   Handles return codes other than {:ok, _} and {:halt, _}
   """
-  def handle({:ok, context}), do: {:ok, context}
-  def handle({:halt, context}), do: {:halt, context}
-  def handle({code, context}, stack) do
-    handler = stack.handlers[code]
-    _handle code, context, handler
+  def handle({:ok, context}, stack), do: {:ok, context}
+  def handle({:halt, context}, stack), do: {:halt, context}
+  def handle({other, context}, stack) do
+    _handle other, context, stack.handler(other)
   end
   
-  defp _handle(code, context, nil), do: {code, context}
-  defp _handle(code, context, stack), do: stack.call context 
+  defp _handle(code, context, nil), do: raise("Unsupported handler: #{code}")
+  defp _handle(code, context, stack), do: stack.call context
+  
+  def handler(key, nil), do: nil
+  def handler(key, stack) do
+    stack.handlers[key] || handler(key, stack.parent)
+  end
+  
 end
