@@ -1,4 +1,4 @@
-defrecord Switchboard.Plug.Fun, func: nil, module: nil, args: [], meta: [] do
+defrecord Switchboard.Plug.Fun, func: nil, module: nil, args: [] do
   def call(context, plug) do
     apply( plug.module, 
            plug.func, 

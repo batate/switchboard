@@ -1,45 +1,17 @@
 defmodule Switchboard.Strategy.ForwardOther do
   
-  
   @doc """
   Calls this stack. 
-
-  Consider a stack with the plugs [plug1, plug2, plug3],
-  all of which return {:ok, context}. 
   
+  Both forms of this call normalize to 
+  call {code, context}, stack
   
-  context |> plug1 |> plug2 |> plug3
-  
-  The traversal will halt if the result is anything other than :ok. 
-  Consider the stack with the plugs [plug1, plug2, plug3], 
-  where plug2 returns {:halt, context}. In this case, invoking the 
-  stack would give you the composition:
-  
-  context |> plug1 |> plug2
-  
-  The traversal will pass non-:ok results through, unless the stack encounters a halt. 
+  Call all of the plugs in this stack, in order, until the code is something other than :ok. 
+  All codes other than :ok will be handled by the stack handler 
   
   """
-  def call(context, stack), do: _call({:ok, context}, stack.plugs, stack)
-  def call({code, context}, stack), do: _call({code, context}, stack.plugs, stack)
-
-  defp _call({:ok, context}, [plug|tail], stack) do
-    _call(plug.call(context), tail, stack) 
+  def call({code, context}, stack) do 
+    stack.call_while_ok({code, context}) |> stack.handle
   end
-    
-  defp _call({:ok, context}, [], _), do: {:ok, context}
-  defp _call({:halt, context}, _, _), do: {:halt, context}
-  defp _call(result, _, stack), do: handle(result, stack)
-
-  @doc """
-  Handles return codes other than {:ok, _} and {:halt, _}
-  """
-  def handle({code, context}, stack) do
-    handler = Keyword.get stack.handlers, code
-    _handle code, context, handler
-  end
-  
-  defp _handle(code, context, nil), do: {code, context}
-  defp _handle(code, context, plug), do: plug.call context 
   
 end
