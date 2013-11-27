@@ -11,7 +11,8 @@ defmodule Switchboard.Strategy.ForwardOther do
   
   """
   def call({code, context}, stack) do 
-    stack.call_while_ok({code, context}) |> stack.handle
+    {code, context} = stack.call_while_ok({code, context}) 
+    stack.handle code, context
   end
   
 end

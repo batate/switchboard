@@ -58,9 +58,9 @@ defrecord Switchboard.Stack, name: nil,
   @doc """
   Handles return codes other than {:ok, _} and {:halt, _}
   """
-  def handle({:ok, context}, stack), do: {:ok, context}
-  def handle({:halt, context}, stack), do: {:halt, context}
-  def handle({other, context}, stack) do
+  def handle(:ok, context, stack), do: {:ok, context}
+  def handle(:halt, context, stack), do: {:halt, context}
+  def handle(other, context, stack) do
     _handle other, context, stack.handler(other)
   end
   
