@@ -1,12 +1,13 @@
 defrecord Switchboard.Stack, name: nil, 
                              plugs: [], 
                              handlers: [], 
+                             registered_plugs: [], 
                              strategy: Switchboard.Strategy.ForwardOther,
                              parent: Switchboard.Stack,
                              meta: Keyword.new do
   @type name              :: atom
   @type plugs             :: [ Switchboard.Plug ]
-  @type handlers          :: Keyword.t
+  @type handlers          :: [ {atom, Switchboard.stack} ]
   @type strategy          :: atom
   @type parent            :: Switchboard.Stack
   @type meta              :: Keyword.t
