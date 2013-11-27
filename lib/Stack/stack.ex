@@ -1,15 +1,16 @@
 defrecord Switchboard.Stack, name: nil, 
                              plugs: [], 
                              handlers: [], 
-                             registered_plugs: [], 
                              strategy: Switchboard.Strategy.ForwardOther,
                              parent: nil,
+                             module: nil, 
                              meta: Keyword.new do
   @type name              :: atom
   @type plugs             :: [ Switchboard.Plug ]
   @type handlers          :: [ {atom, Switchboard.stack} ]
   @type strategy          :: atom
   @type parent            :: Switchboard.Stack
+  @type module            :: atom
   @type meta              :: Keyword.t
   
   @moduledoc """
@@ -56,15 +57,33 @@ defrecord Switchboard.Stack, name: nil,
   defp _call(result, _), do: result
   
   @doc """
-  Handles return codes other than {:ok, _} and {:halt, _}
+  process a handle with the given code. 
+  
+  - :halt and :ok will just pass through, 
+  - :other will try to look at the stack's module for a function named other/2 and invoke it
+  - failing that, will try to invoke the handler on the stack with that name
+  - failing that, will move to the parent and go through the same process
+  - if no handler is found on the parents, will raise an exception
+  
+  
   """
   def handle(:ok, context, stack), do: {:ok, context}
   def handle(:halt, context, stack), do: {:halt, context}
+  def handle(nil, context, stack), do: (raise "Called handle without a name")
   def handle(other, context, stack) do
-    _handle other, context, stack.handler(other)
+    cond do
+      stack.supports_function(other) -> 
+        apply(stack.module, other, ([context, []]))
+      true ->
+        _handle other, context, stack.handler(other)
+    end
   end
   
-  defp _handle(code, context, nil), do: raise("Unsupported handler: #{code}")
+  def supports_function(other, stack) do 
+    ((stack.module != nil) and function_exported?(stack.module, other, 2))
+  end
+  
+  defp _handle(code, context, nil), do: (raise "Unsupported handler: #{code}")
   defp _handle(code, context, stack), do: stack.call context
   
   def handler(key, nil), do: nil

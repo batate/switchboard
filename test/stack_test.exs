@@ -9,6 +9,12 @@ defmodule StackTest do
   def handler, do: Switchboard.Stack.new plugs: [plug], name: "inc"
   def stack_with_handler, do: Switchboard.Stack.new plugs: [plug], handlers: [inc: handler]
   def child_stack, do: Switchboard.Stack.new plugs: [plug, plug], parent: stack_with_handler, name: "double"
+  
+  defmodule FunctionHandlerTest do
+    def test(_, options // []), do: {:ok, "success"}
+  end
+  
+  def stack_with_module, do: Switchboard.Stack.new module: FunctionHandlerTest, plugs: []
 
   test "should add a handler to stack" do
     added = stack.add_handler(handler)
@@ -23,5 +29,10 @@ defmodule StackTest do
   
   test "should access parent's handlers" do
     assert child_stack.handler(:inc) == handler
+  end
+  
+  test "should invoke function handler" do
+    assert stack_with_module.module == FunctionHandlerTest
+    assert stack_with_module.handle( :test, 1) == {:ok, "success"}
   end
 end

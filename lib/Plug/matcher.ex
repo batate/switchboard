@@ -31,7 +31,7 @@ defmodule Switchboard.Plug.Factory do
   defp create_from_atom(plug_spec, env) do
     cond do
       is_elixir_module(plug_spec) -> 
-        Switchboard.Plug.Mod.new module: plug_spec
+        Switchboard.Plug.Mod.new( module: plug_spec )
       is_registered_plug(plug_spec, env) -> 
         env.plugs[plug_spec]
       true ->
