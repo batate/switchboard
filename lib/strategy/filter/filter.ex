@@ -57,9 +57,9 @@ defrecord Switchboard.Strategy.Filter,
   
   """
   def call({code, context}, stack, strategy) do
-    result = stack.call_while_ok({code, context})
-    stack.ensure context
-    case result do
+    {code, context} = stack.call_while_ok({code, context})
+    {_, context} = stack.ensure context
+    case {code, context} do
       { :ok, context } -> {:ok, context}
       { :halt, context } -> {:halt, context}
       {other, context} -> stack.handle other, context
@@ -107,7 +107,7 @@ defrecord Switchboard.Strategy.Filter,
   def new_dispatcher(strategy) do
     Switchboard.Plug.Fun.new func: :dispatch, 
                              module: Switchboard.Plug.Dispatcher, 
-                             args: [strategy.controller, strategy.action_fun, strategy.args_fun || (fn -> [] end) ]
+                             args: [strategy.controller, strategy.action_function, strategy.args_function || (fn(_) -> [] end) ]
   end
 
 

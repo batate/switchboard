@@ -1,11 +1,13 @@
 defmodule FilterStrategyTest do
   use ExUnit.Case
   require Switchboard
-  import Switchboard
 
   defmodule Controller do
-    def show(context, opts // []), do: {:render, context.assign(:render, context.assign(:invoke, :show))}
-    def index(context, opts // []), do: {:render, context.assign(:render, context.assign(:invoke, :index))}
+    def show(context, opts // []), do: {:ok, context.assign(:invoke, :show)}
+    def index(context, opts // []), do: {:ok, context.assign(:invoke, :index)}
+    def ensure(context, opts // []) do
+      {:ok, context.assign(:ensure, true)}
+    end
   end
 
   def strategy do 
@@ -17,18 +19,29 @@ defmodule FilterStrategyTest do
   def filter, do: strategy.new_filter( plug, {:only, [:show]})
   def show_context, do: Switchboard.Context.new.assign(:action, :show)
   def index_context, do: Switchboard.Context.new.assign(:action, :index)
+  def dispatch, do: strategy.new_dispatcher
   
-  def stack, do: Switchboard.Stack.new plugs: [filter], strategy: strategy
+  def stack, do: Switchboard.Stack.new plugs: [filter, dispatch], strategy: strategy, module: Controller
   
   
   test "should invoke before filter" do
-    {code, context} = stack.call(show_context)
+    {_, context} = stack.call(show_context)
     assert "true" == context.assigns[:plug_invoked]
   end
   
   test "should not before filter" do
-    {code, context} = stack.call(index_context)
+    {_, context} = stack.call(index_context)
     assert nil == context.assigns[:plug_invoked]
+  end
+  
+  test "should dispatch" do
+    {_, context} = stack.call(index_context)
+    assert context.assigns[:invoke] == :index
+  end
+  
+  test "should invoke ensure" do
+    {_, context} = stack.call(index_context)
+    assert context.assigns[:ensure] == true
   end
   
 end

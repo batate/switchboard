@@ -85,12 +85,16 @@ defrecord Switchboard.Stack, name: nil,
   def ensure(context, stack) do
     cond do
       stack.supports_function(:ensure) -> 
-        apply(stack.module, :ensure, ([context, []]))
+        stack.fire_ensure(context)
       stack.handlers[:ensure] != nil ->
-        stack.handlers[:ensure].call context
+        stack.handlers[:ensure].call {:ok, context}
       true ->
         {:ok, context}
     end
+  end
+  
+  def fire_ensure(context, stack) do
+    apply(stack.module, :ensure, ([context, []]))
   end
   
   def supports_function(other, stack) do 
