@@ -36,12 +36,12 @@ defmodule SwitchboardTest do
     assert (added.handlers |> Enum.count) == 1
     assert Keyword.get( added.handlers, :double ).name == "double"
   end
-
-  test "should add meta" do
-    added = stack.add_meta(:key, "value")
-    assert (added.metadata(:key)) == "value"
-  end
   
+  test "should set strategy" do
+    changed = stack.set_strategy( Switchboard.Strategy.Filter.new )
+    assert changed.strategy.controller == nil
+  end
+
   test "should set context" do
     context = Context.new assigns: [color: :red]
     assert context.get(:color) == :red

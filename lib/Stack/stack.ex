@@ -1,10 +1,14 @@
 defrecord Switchboard.Stack, name: nil, 
                              plugs: [], 
                              handlers: [], 
+                             strategy: Switchboard.Strategy.ForwardOther,
+                             parent: Switchboard.Stack,
                              meta: Keyword.new do
   @type name              :: atom
   @type plugs             :: [ Switchboard.Plug ]
   @type handlers          :: Keyword.t
+  @type strategy          :: atom
+  @type parent            :: Switchboard.Stack
   @type meta              :: Keyword.t
   
   @moduledoc """
@@ -28,9 +32,6 @@ defrecord Switchboard.Stack, name: nil,
   """
   def add_plug(plug, stack), do: stack.update( plugs: stack.plugs ++ [plug])
 
-  def add_meta(key, value, stack), do: stack.update( meta: Keyword.put( stack.meta, key, value) ) 
-  def metadata(key, stack), do: stack.meta[key]
-  
   
   
   @doc """
@@ -41,8 +42,7 @@ defrecord Switchboard.Stack, name: nil,
     stack.update handlers: (stack.handlers |> Keyword.put(binary_to_atom( handler.name ), handler))
   end
   
-  def set_strategy(strategy, stack), do: stack.add_meta(:strategy, strategy)
-  def strategy(stack), do: stack.metadata(:strategy) || Switchboard.Strategy.ForwardOther
+  def set_strategy(strategy, stack), do: stack.update( strategy: strategy )
   
   def call_while_ok({code, context}, stack), do: _call({code, context}, stack.plugs)
   def call_while_ok(context, stack), do: _call({:ok, context}, stack.plugs)
