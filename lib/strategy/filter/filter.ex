@@ -1,4 +1,7 @@
-defrecord Switchboard.Strategy.Filter, controller: nil, action_function: nil, args_function: nil do
+defrecord Switchboard.Strategy.Filter, 
+  controller: nil, 
+  action_function: nil, 
+  args_function: nil do
   @moduledoc """
   # Filter and Dispatch Strategy
   
@@ -42,20 +45,29 @@ defrecord Switchboard.Strategy.Filter, controller: nil, action_function: nil, ar
   - the controller for your application
   - an optional function to return the arguments that you would like to pass to your controller. 
   """
-  
+
   @doc """
-  Test whether an action satisfies the criteria in membership. 
+  The DSL will build a stack, with a dispatcher at the end, and an :ensures handler. 
   
-  - Membership is a tuple or nil. 
-  - The tuple has a test, and a list of actions
-  - The test can be :only or :except.
+  The call function should traverse the stack using the basic rules for forward_other, 
+  with one exception:
+  
+  the return code is processed after executing the ensures stack. 
+  
   
   """
+  def call({code, context}, stack, strategy) do
+    result = stack.call_while_ok({code, context})
+    stack.ensure context
+    case result do
+      { :ok, context } -> {:ok, context}
+      { :halt, context } -> {:halt, context}
+      {other, context} -> stack.handle other, context
+    end
+  end
+
+
   
-  # imp call here:
-  # call plugs
-  # handle ensure 
-  # handle plugs return code
 
   @doc """
   Create an IfPlug that works as a filter for this strategy. 
@@ -99,25 +111,6 @@ defrecord Switchboard.Strategy.Filter, controller: nil, action_function: nil, ar
   end
 
 
-  @doc """
-  The DSL will build a stack, with a dispatcher at the end, and an :ensures handler. 
-  
-  The call function should traverse the stack using the basic rules for forward_other, 
-  with one exception:
-  
-  the return code is processed after executing the ensures stack. 
-  
-  
-  """
-  def call(context, stack) do
-    result = stack.call_while_ok(context)
-    stack.handle {:ensure, context}, stack
-    case result do
-      { :ok, context } -> {:ok, context}
-      { :halt, context } -> {:halt, context}
-      {other, context} -> stack.handle {other, context}
-    end
-  end
   
   
 

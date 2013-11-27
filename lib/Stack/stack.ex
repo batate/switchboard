@@ -26,7 +26,7 @@ defrecord Switchboard.Stack, name: nil,
   @doc """
   Call the stack with the associated strategy. 
   """
-  def call({code, context}, stack), do: stack.strategy.call({code, context}, stack)
+  def call({:ok, context}, stack), do: stack.strategy.call({:ok, context}, stack)
   def call(context, stack), do: call({:ok, context}, stack)
 
   @doc """
@@ -46,15 +46,11 @@ defrecord Switchboard.Stack, name: nil,
   
   def set_strategy(strategy, stack), do: stack.update( strategy: strategy )
   
-  def call_while_ok({code, context}, stack), do: _call({code, context}, stack.plugs)
-  def call_while_ok(context, stack), do: _call({:ok, context}, stack.plugs)
+  def call_while_ok({code, context}, stack), do: _call_while_ok({code, context}, stack.plugs)
     
-
-  defp _call({:ok, context}, [plug|tail]), do: _call(plug.call(context), tail) 
-    
-  defp _call({:ok, context}, []), do: {:ok, context}
-  defp _call({:halt, context}, _), do: {:halt, context}
-  defp _call(result, _), do: result
+  defp _call_while_ok({:ok, context}, []), do: {:ok, context}
+  defp _call_while_ok({:ok, context}, [plug|tail]), do: _call_while_ok(plug.call(context), tail) 
+  defp _call_while_ok({code, context}, _), do: {code, context}
   
   @doc """
   process a handle with the given code. 
@@ -78,11 +74,6 @@ defrecord Switchboard.Stack, name: nil,
         _handle other, context, stack.handler(other)
     end
   end
-  
-  def supports_function(other, stack) do 
-    ((stack.module != nil) and function_exported?(stack.module, other, 2))
-  end
-  
   defp _handle(code, context, nil), do: (raise "Unsupported handler: #{code}")
   defp _handle(code, context, stack), do: stack.call context
   
@@ -90,5 +81,21 @@ defrecord Switchboard.Stack, name: nil,
   def handler(key, stack) do
     stack.handlers[key] || handler(key, stack.parent)
   end
+  
+  def ensure(context, stack) do
+    cond do
+      stack.supports_function(:ensure) -> 
+        apply(stack.module, :ensure, ([context, []]))
+      stack.handlers[:ensure] != nil ->
+        stack.handlers[:ensure].call context
+      true ->
+        {:ok, context}
+    end
+  end
+  
+  def supports_function(other, stack) do 
+    ((stack.module != nil) and function_exported?(stack.module, other, 2))
+  end
+  
   
 end

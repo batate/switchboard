@@ -1,4 +1,4 @@
-defmodule Switchboard.Strategy.Halt do
+defrecord Switchboard.Strategy.Halt, module: nil do
   
   
   @doc """

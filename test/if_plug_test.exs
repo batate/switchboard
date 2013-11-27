@@ -2,8 +2,8 @@ defmodule IfPlugTest do
   use ExUnit.Case
   
   
-  def show_context, do: Context.new assigns: [action: :show]
-  def index_context, do: Context.new assigns: [action: :index]
+  def show_context, do: Switchboard.Context.new assigns: [action: :show]
+  def index_context, do: Switchboard.Context.new assigns: [action: :index]
 
   def check_plug do
     Switchboard.Plug.Fun.new(func: :assign, module: __MODULE__)

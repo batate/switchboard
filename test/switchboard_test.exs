@@ -29,7 +29,7 @@ defmodule SwitchboardTest do
     do: assert( module_plug.call(2) == {:ok, 6} )
     
   test "should set context" do
-    context = Context.new assigns: [color: :red]
+    context = Switchboard.Context.new assigns: [color: :red]
     assert context.get(:color) == :red
     
     context = context.assign :color, :blue
