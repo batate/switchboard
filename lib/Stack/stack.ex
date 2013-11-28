@@ -1,22 +1,11 @@
-defrecord Switchboard.Stack, name: nil, 
-                             plugs: [], 
-                             handlers: [], 
-                             strategy: Switchboard.Strategy.ForwardOther,
-                             parent: nil,
-                             module: nil, 
-                             meta: Keyword.new do
-  @type name              :: atom
-  @type plugs             :: [ Switchboard.Plug ]
-  @type handlers          :: [ {atom, Switchboard.stack} ]
-  @type strategy          :: atom
-  @type parent            :: Switchboard.Stack
-  @type module            :: atom
-  @type meta              :: Keyword.t
+defmodule Switchboard.Stack do
   
   @moduledoc """
   Stacks
   
-  A stack is a composition of plugs. Stack implements Switchboard.Plug, so you can invoke it just as you would a plug.
+  A stack is a composition of plugs. This module has behaviors; 
+  the entity with attributes is in Stack.Entity.
+  Stack implements Switchboard.Plug, so you can invoke it just as you would a plug.
   
   ## Calling a stack
 
@@ -26,27 +15,28 @@ defrecord Switchboard.Stack, name: nil,
   @doc """
   Call the stack with the associated strategy. 
   """
-  def call({:ok, context}, stack), do: stack.strategy.call({:ok, context}, stack)
-  def call(context, stack), do: call({:ok, context}, stack)
+  def call(stack, {code, context}), do: stack.strategy.call( {code, context}, stack)
+  
+  def call(stack, tuple), do: raise "********************Got a call with tuple #{inspect tuple}**************************"
 
   @doc """
   Returns a new stack with a plug appended to the end of plugs.
   """
-  def add_plug(plug, stack), do: stack.update( plugs: stack.plugs ++ [plug])
+  def add_plug(stack, plug), do: stack.update( plugs: stack.plugs ++ [plug])
 
   
   
   @doc """
   Add a new handler to the stack
   """
-  def add_handler(handler, stack) do
+  def add_handler(stack, handler) do
     if handler.name == nil, do: raise "A stack must have a name to be a handler"
     stack.update handlers: (stack.handlers |> Keyword.put(binary_to_atom( handler.name ), handler))
   end
   
-  def set_strategy(strategy, stack), do: stack.update( strategy: strategy )
+  def set_strategy(stack, strategy), do: stack.update( strategy: strategy )
   
-  def call_while_ok({code, context}, stack), do: _call_while_ok({code, context}, stack.plugs)
+  def call_while_ok(stack, {code, context}), do: _call_while_ok({code, context}, stack.plugs)
     
   defp _call_while_ok({:ok, context}, []), do: {:ok, context}
   defp _call_while_ok({:ok, context}, [plug|tail]), do: _call_while_ok(plug.(context), tail) 
@@ -63,41 +53,44 @@ defrecord Switchboard.Stack, name: nil,
   
   
   """
-  def handle(:ok, context, stack), do: {:ok, context}
-  def handle(:halt, context, stack), do: {:halt, context}
-  def handle(nil, context, stack), do: (raise "Called handle without a name")
-  def handle(other, context, stack) do
+  def handle(stack, :ok, context), do: {:ok, context}
+  def handle(stack, :halt, context), do: {:halt, context}
+  def handle(stack, nil, context), do: (raise "Called handle without a name")
+  def handle(stack, other, context) do
     cond do
-      stack.supports_function(other) -> 
+      supports_function(stack, other) -> 
         apply(stack.module, other, ([context, []]))
       true ->
-        _handle other, context, stack.handler(other)
+        _handle other, context, handler(stack, other)
     end
   end
   defp _handle(code, context, nil), do: (raise "Unsupported handler: #{code}")
-  defp _handle(code, context, stack), do: stack.call context
+  defp _handle(code, context, stack), do: call( stack, {:ok, context})
   
-  def handler(key, nil), do: nil
-  def handler(key, stack) do
-    stack.handlers[key] || handler(key, stack.parent)
+  
+  
+  def handler(nil, key), do: nil
+  def handler(stack, key) do
+    stack.handlers[key] || handler(stack.parent, key)
   end
   
-  def ensure(context, stack) do
+  def ensure(stack, context) do
+    ensure_stack = stack.handlers[:ensure] 
     cond do
-      stack.supports_function(:ensure) -> 
-        stack.fire_ensure(context)
-      stack.handlers[:ensure] != nil ->
-        stack.handlers[:ensure].call {:ok, context}
+      supports_function(stack, :ensure) -> 
+        {code, context} = fire_ensure_function(stack, context)
+      ensure_stack != nil ->
+        Switchboard.Stack.call ensure_stack, {:ok, context}
       true ->
         {:ok, context}
     end
   end
   
-  def fire_ensure(context, stack) do
+  def fire_ensure_function(stack, context) do
     apply(stack.module, :ensure, ([context, []]))
   end
   
-  def supports_function(other, stack) do 
+  def supports_function(stack, other) do 
     ((stack.module != nil) and function_exported?(stack.module, other, 2))
   end
   

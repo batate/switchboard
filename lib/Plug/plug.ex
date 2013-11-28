@@ -23,7 +23,7 @@ defmodule Switchboard.Plug do
     stack = opts[:stack]
     handler_name = opts[:handler_name]
     if nil?( handler_name), do: no_handler
-    stack.handle(handler_name, context)
+    Switchboard.Stack.handle(stack, handler_name, context)
   end
 
   defp no_handler, do: raise( "You attempted to call a handler plug with no handler")
@@ -33,7 +33,7 @@ defmodule Switchboard.Plug do
   def invoke_from_module_plug(context, opts) do
     module = opts[:module]
     options = opts[:options] || Keyword.new
-    module.stack.call {:ok, context}
+    Switchboard.Stack.call module.stack, {:ok, context}
   end
   
   

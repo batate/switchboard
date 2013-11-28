@@ -11,7 +11,7 @@ defmodule SwitchboardTest do
   defmodule WithPlugs do
     def simple_plug, do: Switchboard.Plug.new_from_mod_fun func: :inc, module: SwitchboardTest
     def double_plug, do: Switchboard.Plug.new_from_mod_fun func: :double, module: SwitchboardTest
-    def stack, do: Switchboard.Stack.new plugs: [simple_plug, double_plug]
+    def stack, do: Switchboard.Stack.Entity.new plugs: [simple_plug, double_plug]
   end
   
   def module_plug, do: Switchboard.Plug.new_from_module(module: WithPlugs)

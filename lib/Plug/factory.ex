@@ -37,7 +37,7 @@ defmodule Switchboard.Plug.Factory do
         raise "Unsupported plug format"
     end
     
-    stack.add_plug new_plug
+    Switchboard.Stack.add_plug stack, new_plug
   end
   
   defp create_from_tuple({module, function}) do

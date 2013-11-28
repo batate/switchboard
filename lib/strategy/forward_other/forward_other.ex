@@ -10,9 +10,11 @@ defmodule Switchboard.Strategy.ForwardOther do
   All codes other than :ok will be handled by the stack handler 
   
   """
-  def call({code, context}, stack) do 
-    {code, context} = stack.call_while_ok({code, context}) 
-    stack.handle code, context
+  def call({code, context}, stack) do
+     
+    {code, context} = Switchboard.Stack.call_while_ok(stack, {code, context}) 
+    result = Switchboard.Stack.handle stack, code, context
+    result
   end
   
 end
