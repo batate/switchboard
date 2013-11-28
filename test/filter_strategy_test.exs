@@ -15,7 +15,7 @@ defmodule FilterStrategyTest do
                                     action_function: &(Switchboard.Context.get(:action, &1)) 
   end
 
-  def plug, do: Switchboard.Plug.Anon.new func: (fn(context, opts) -> ({:ok, context.assign(:plug_invoked, "true")}) end)
+  def plug, do: Switchboard.Plug.Anon.new func: (fn(context, _) -> ({:ok, context.assign(:plug_invoked, "true")}) end)
   def filter, do: strategy.new_filter( plug, {:only, [:show]})
   def show_context, do: Switchboard.Context.new.assign(:action, :show)
   def index_context, do: Switchboard.Context.new.assign(:action, :index)
