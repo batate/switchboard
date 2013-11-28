@@ -49,7 +49,7 @@ defrecord Switchboard.Stack, name: nil,
   def call_while_ok({code, context}, stack), do: _call_while_ok({code, context}, stack.plugs)
     
   defp _call_while_ok({:ok, context}, []), do: {:ok, context}
-  defp _call_while_ok({:ok, context}, [plug|tail]), do: _call_while_ok(plug.call(context), tail) 
+  defp _call_while_ok({:ok, context}, [plug|tail]), do: _call_while_ok(plug.(context), tail) 
   defp _call_while_ok({code, context}, _), do: {code, context}
   
   @doc """

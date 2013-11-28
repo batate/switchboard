@@ -31,7 +31,7 @@ defmodule ForwardOtherStrategyTest do
     do: assert( stack.call(2) == {:ok, 12} )
 
   test "should call module plug",
-    do: assert( module_plug.call(2) == {:ok, 6} )
+    do: assert( module_plug.(2) == {:ok, 6} )
     
   test "should handle tuple", 
     do: assert( stack_with_handler.handle(:double, 1) == {:ok, 2})

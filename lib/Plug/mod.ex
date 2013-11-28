@@ -1,12 +1,13 @@
-defrecord Switchboard.Plug.Mod, module: nil, options: Keyword.new do
-  def call(context, plug), do: plug.module.stack.call {:ok, context}
+defmodule Switchboard.Plug.Mod do
+  # module: nil, options: Keyword.new
   
-  def name(plug) do 
-    plug.module |> 
-    Kernel.to_string |> 
-    String.split( ".") |>
-    Enum.reverse |> 
-    Enum.first |> 
-    Mix.Utils.underscore
+  def new(opts), do: &invoke_module_stack(&1, opts)
+  
+  def invoke_module_stack(context, opts) do
+    module = opts[:module]
+    options = opts[:options] || Keyword.new
+    module.stack.call {:ok, context}
   end
+  
+  def call(context, plug), do: plug.(context)
 end

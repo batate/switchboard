@@ -28,7 +28,7 @@ defmodule Switchboard.Plug.IfPlug do
     _call options[:plug], context, test
   end
   
-  defp _call(plug, context, true), do: plug.call(context)
+  defp _call(plug, context, true), do: plug.(context)
   defp _call(_, context, false), do: {:ok, context}
   
 end

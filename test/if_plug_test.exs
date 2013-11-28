@@ -19,12 +19,12 @@ defmodule IfPlugTest do
   end
   
   test "should fire ifplug based on action being in only" do
-    {:ok, result} = ifplug.call show_context
+    {:ok, result} = ifplug.( show_context )
     assert result.get( :check ) == "function was called"
   end
   
   test "should not fire ifplug based on action not being in only" do
-    {:ok, result} = ifplug.call index_context
+    {:ok, result} = ifplug.( index_context )
     assert result.get( :check ) == nil
   end
     

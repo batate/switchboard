@@ -26,7 +26,7 @@ defrecord Switchboard.Strategy.Halt, module: nil do
   defp _call({:halt, context}, _), do: {:halt, context}
   defp _call(code, []), do: code
   defp _call({code, context}, [plug|tail]) do
-    _call(plug.call(context), tail) 
+    _call(plug.(context), tail) 
   end
   
   

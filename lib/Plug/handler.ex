@@ -1,12 +1,17 @@
+defmodule Switchboard.Plug.Handler do 
+  def new(opts // []) do
+    &(__MODULE__.invoke_hanlder(&1, opts))
+  end
+  
+  def call(context, plug), do: plug.(context)
+  
+  def invoke_hanlder(context, opts // Keyword.new) do
+    stack = opts[:stack]
+    handler_name = opts[:handler_name]
+    if nil?( handler_name), do: no_handler
+    stack.handle(handler_name, context)
+  end
 
+  def no_handler, do: raise( "You attempted to call a handler plug with no handler")
 
-defrecord Switchboard.Plug.Handler, 
-    stack: Switchboard.Plug.Handler.Default, 
-    handler_name: nil, 
-    options: [] do
-  def call(context, plug), do: plug.stack.handle(plug.handler_name, context)
-end
-
-defmodule Switchboard.Plug.Handler.Default do
-  def call(_, _), do: raise "You attempted to call a handler plug with no handler"
 end

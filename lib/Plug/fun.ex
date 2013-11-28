@@ -1,4 +1,4 @@
-defrecord Switchboard.Plug.Fun, func: nil, module: nil, options: Keyword.new do
+defmodule Switchboard.Plug.Fun do
   @moduledoc """
   Fun Plugs
   
@@ -12,9 +12,17 @@ defrecord Switchboard.Plug.Fun, func: nil, module: nil, options: Keyword.new do
   @doc """
   Call the function named by func on module
   """
+  def new(opts // Keyword.new) do
+    &apply_function(&1, opts)
+  end
+  
+  def apply_function(context, opts) do
+    apply opts[:module], 
+          opts[:func],
+          [context, opts[:options]]
+  end
+  
   def call(context, plug) do
-    apply plug.module, 
-          plug.func, 
-          [context, plug.options]
+    plug.(context)
   end
 end

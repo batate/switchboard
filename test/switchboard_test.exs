@@ -17,16 +17,13 @@ defmodule SwitchboardTest do
   def module_plug, do: Switchboard.Plug.Mod.new(module: WithPlugs)
   
   test "should call simple plug", 
-    do: assert( simple_plug.call(0) == {:ok, 1})
+    do: assert( simple_plug.(0) == {:ok, 1})
 
   test "should call plug with module", 
-    do: assert( double_plug.call(1) == {:ok, 2})
+    do: assert( double_plug.(1) == {:ok, 2})
     
-  test "should name module", 
-    do: assert( "with_plugs" == module_plug.name)
-  
   test "should call module plug",
-    do: assert( module_plug.call(2) == {:ok, 6} )
+    do: assert( module_plug.(2) == {:ok, 6} )
     
   test "should set context" do
     context = Switchboard.Context.new assigns: [color: :red]

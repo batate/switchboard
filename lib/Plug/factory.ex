@@ -7,6 +7,11 @@ defmodule Switchboard.Plug.Factory do
   
   @doc """
   Create a plug
+
+  Tuple plugs take the form {Module, :atom}
+  where :atom is a function on a module
+  
+  Atoms are handlers 
   
   This class translates all of the varous shorthand plug formats and creates formal records based on this specification. 
   
@@ -35,23 +40,11 @@ defmodule Switchboard.Plug.Factory do
     stack.add_plug new_plug
   end
   
-  @doc """
-  Create from tuple
-  
-  Tuple plugs take the form {Module, :atom}
-  
-  where :atom is a function on a module
-  """
   defp create_from_tuple({module, function}) do
     Switchboard.Plug.Fun.new func: function, module: module
   end
 
   
-  @doc """
-  Create from atom
-  
-  Atoms are handlers 
-  """
   defp create_from_atom(plug_spec, stack) do
     cond do
       is_elixir_module(plug_spec) -> 

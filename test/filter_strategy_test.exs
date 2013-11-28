@@ -23,7 +23,7 @@ defmodule FilterStrategyTest do
   
   def stack, do: Switchboard.Stack.new plugs: [filter, dispatch], strategy: strategy, module: Controller
   
-  test "should invoke plug", do: plug.call(show_context)
+  test "should invoke plug", do: plug.(show_context)
   
   test "should invoke before filter" do
     {_, context} = stack.call(show_context)
