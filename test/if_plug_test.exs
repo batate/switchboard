@@ -6,7 +6,7 @@ defmodule IfPlugTest do
   def index_context, do: Switchboard.Context.new assigns: [action: :index]
 
   def check_plug do
-    Switchboard.Plug.Fun.new(func: :assign, module: __MODULE__)
+    Switchboard.Plug.new_from_mod_fun(func: :assign, module: __MODULE__)
   end
   
   def assign(context, _), do: {:ok, context.assign(:check, "function was called")}

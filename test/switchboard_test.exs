@@ -5,16 +5,16 @@ defmodule SwitchboardTest do
   def inc(int, _), do: {:ok, int + 1}
   def double(int, _), do: {:ok, int * 2}
 
-  def simple_plug, do: Switchboard.Plug.Anon.new func: (fn(x, _) -> {:ok, x + 1} end)
-  def double_plug, do: Switchboard.Plug.Fun.new func: :double, module: __MODULE__
+  def simple_plug, do: Switchboard.Plug.new_from_anon func: (fn(x, _) -> {:ok, x + 1} end)
+  def double_plug, do: Switchboard.Plug.new_from_mod_fun func: :double, module: __MODULE__
 
   defmodule WithPlugs do
-    def simple_plug, do: Switchboard.Plug.Fun.new func: :inc, module: SwitchboardTest
-    def double_plug, do: Switchboard.Plug.Fun.new func: :double, module: SwitchboardTest
+    def simple_plug, do: Switchboard.Plug.new_from_mod_fun func: :inc, module: SwitchboardTest
+    def double_plug, do: Switchboard.Plug.new_from_mod_fun func: :double, module: SwitchboardTest
     def stack, do: Switchboard.Stack.new plugs: [simple_plug, double_plug]
   end
   
-  def module_plug, do: Switchboard.Plug.Mod.new(module: WithPlugs)
+  def module_plug, do: Switchboard.Plug.new_from_module(module: WithPlugs)
   
   test "should call simple plug", 
     do: assert( simple_plug.(0) == {:ok, 1})

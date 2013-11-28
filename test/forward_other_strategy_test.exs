@@ -6,9 +6,9 @@ defmodule ForwardOtherStrategyTest do
   def double(int, _), do: {:ok, int * 2}
   def halt(int, _), do: {:halt, int}
 
-  def simple_plug, do: Switchboard.Plug.Fun.new func: :inc, module: __MODULE__
-  def double_plug, do: Switchboard.Plug.Fun.new func: :double, module: __MODULE__
-  def halt_plug, do: Switchboard.Plug.Fun.new func: :halt, module: __MODULE__
+  def simple_plug, do: Switchboard.Plug.new_from_mod_fun func: :inc, module: __MODULE__
+  def double_plug, do: Switchboard.Plug.new_from_mod_fun func: :double, module: __MODULE__
+  def halt_plug, do: Switchboard.Plug.new_from_mod_fun func: :halt, module: __MODULE__
   def stack, do: Switchboard.Stack.new plugs: [simple_plug, double_plug, double_plug]
   def halt_stack, do: Switchboard.Stack.new plugs: [simple_plug, halt_plug, double_plug]
   def handler, do: Switchboard.Stack.new plugs: [double_plug], name: "double"
@@ -17,12 +17,12 @@ defmodule ForwardOtherStrategyTest do
   end
   
   defmodule WithPlugs do
-    def simple_plug, do: Switchboard.Plug.Fun.new func: :inc, module: ForwardOtherStrategyTest
-    def double_plug, do: Switchboard.Plug.Fun.new func: :double, module: ForwardOtherStrategyTest
+    def simple_plug, do: Switchboard.Plug.new_from_mod_fun func: :inc, module: ForwardOtherStrategyTest
+    def double_plug, do: Switchboard.Plug.new_from_mod_fun func: :double, module: ForwardOtherStrategyTest
     def stack, do: Switchboard.Stack.new plugs: [simple_plug, double_plug]
   end
   
-  def module_plug, do: Switchboard.Plug.Mod.new(module: WithPlugs)
+  def module_plug, do: Switchboard.Plug.new_from_module(module: WithPlugs)
   
   test "should halt stack",
     do: assert( halt_stack.call(0) == {:halt, 1} )

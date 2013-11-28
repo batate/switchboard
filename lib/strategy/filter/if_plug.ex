@@ -16,7 +16,7 @@ defmodule Switchboard.Plug.IfPlug do
 
   """
   def new(plug, action_fun, comparison_fun, options) do
-    Switchboard.Plug.Fun.new func: :call, module: __MODULE__, 
+    Switchboard.Plug.new_from_mod_fun func: :call, module: __MODULE__, 
                              options: [plug: plug, 
                                        action_fun: action_fun, 
                                        comparison_fun: comparison_fun, 

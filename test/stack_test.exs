@@ -3,7 +3,7 @@ defmodule StackTest do
   require Switchboard
 
 
-  def plug, do: Switchboard.Plug.Anon.new func: &({:ok, &1 + 1})
+  def plug, do: Switchboard.Plug.new_from_anon func: &({:ok, &1 + 1})
   def stack, do: Switchboard.Stack.new plugs: [plug, plug]
   
   def handler, do: Switchboard.Stack.new plugs: [plug], name: "inc"

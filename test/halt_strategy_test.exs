@@ -5,8 +5,8 @@ defmodule HaltStrategyTest do
   def inc(int, _), do: {:ok, int + 1}
   def halt(int, _), do: {:halt, int}
 
-  def simple_plug, do: Switchboard.Plug.Fun.new func: :inc, module: __MODULE__
-  def halt_plug, do: Switchboard.Plug.Fun.new func: :halt, module: __MODULE__
+  def simple_plug, do: Switchboard.Plug.new_from_mod_fun func: :inc, module: __MODULE__
+  def halt_plug, do: Switchboard.Plug.new_from_mod_fun func: :halt, module: __MODULE__
   def halt_stack do
     stack = Switchboard.Stack.new plugs: [simple_plug, halt_plug, simple_plug]
     stack.set_strategy Switchboard.Strategy.Halt

@@ -6,7 +6,7 @@ defmodule PlugFactoryTest do
   def inc(int, _), do: {:ok, int + 1}
   
   
-  def simple_plug, do: Switchboard.Plug.Anon.new func: (fn(x, _) -> {:ok, x  * 3} end)
+  def simple_plug, do: Switchboard.Plug.new_from_anon func: (fn(x, _) -> {:ok, x  * 3} end)
 
   defmodule Plugs do
     def double(int, _), do: {:ok, int * 2}
