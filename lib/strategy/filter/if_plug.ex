@@ -15,13 +15,17 @@ defmodule Switchboard.Plug.IfPlug do
   Creates a new ifplug. This plug is a module, not a record. 
 
   """
-  def new(plug, action_fun, comparison_fun, args) do
-    Switchboard.Plug.Fun.new func: :call, module: __MODULE__, args: [plug, action_fun, comparison_fun, args]
+  def new(plug, action_fun, comparison_fun, options) do
+    Switchboard.Plug.Fun.new func: :call, module: __MODULE__, 
+                             options: [plug: plug, 
+                                       action_fun: action_fun, 
+                                       comparison_fun: comparison_fun, 
+                                       comparison_args: options]
   end
   
-  def call(context, plug, action_fun, comparison_fun, args) do
-    test = context |> action_fun.() |> comparison_fun.( args )
-    _call plug, context, test
+  def call(context, options) do
+    test = context |> options[:action_fun].() |> options[:comparison_fun].( options[:comparison_args] )
+    _call options[:plug], context, test
   end
   
   defp _call(plug, context, true), do: plug.call(context)

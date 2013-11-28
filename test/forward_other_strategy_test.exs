@@ -2,9 +2,9 @@ defmodule ForwardOtherStrategyTest do
   use ExUnit.Case
   require Switchboard
 
-  def inc(int), do: {:ok, int + 1}
-  def double(int), do: {:ok, int * 2}
-  def halt(int), do: {:halt, int}
+  def inc(int, _), do: {:ok, int + 1}
+  def double(int, _), do: {:ok, int * 2}
+  def halt(int, _), do: {:halt, int}
 
   def simple_plug, do: Switchboard.Plug.Fun.new func: :inc, module: __MODULE__
   def double_plug, do: Switchboard.Plug.Fun.new func: :double, module: __MODULE__

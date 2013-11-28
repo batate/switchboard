@@ -2,7 +2,8 @@
 
 defrecord Switchboard.Plug.Handler, 
     stack: Switchboard.Plug.Handler.Default, 
-    handler_name: nil, args: [] do
+    handler_name: nil, 
+    options: [] do
   def call(context, plug), do: plug.stack.handle(plug.handler_name, context)
 end
 

@@ -11,7 +11,7 @@ defmodule StackTest do
   def child_stack, do: Switchboard.Stack.new plugs: [plug, plug], parent: stack_with_handler, name: "double"
   
   defmodule FunctionHandlerTest do
-    def test(_, options // []), do: {:ok, "success"}
+    def test(_, _), do: {:ok, "success"}
   end
   
   def stack_with_module, do: Switchboard.Stack.new module: FunctionHandlerTest, plugs: []

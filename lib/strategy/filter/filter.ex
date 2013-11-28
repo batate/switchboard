@@ -107,7 +107,9 @@ defrecord Switchboard.Strategy.Filter,
   def new_dispatcher(strategy) do
     Switchboard.Plug.Fun.new func: :dispatch, 
                              module: Switchboard.Plug.Dispatcher, 
-                             args: [strategy.controller, strategy.action_function, strategy.args_function || (fn(_) -> [] end) ]
+                             options: [controller: strategy.controller, 
+                                       action_fun: strategy.action_function, 
+                                       args_fun: strategy.args_function || (fn(_) -> [] end) ]
   end
 
 

@@ -9,11 +9,11 @@ defmodule IfPlugTest do
     Switchboard.Plug.Fun.new(func: :assign, module: __MODULE__)
   end
   
-  def assign(context), do: {:ok, context.assign(:check, "function was called")}
+  def assign(context, _), do: {:ok, context.assign(:check, "function was called")}
   
   def ifplug do 
     Switchboard.Plug.IfPlug.new( check_plug, 
-                                 &(&1.assigns[ :action ]), 
+                                 &(Switchboard.Context.get :action, &1), 
                                  &Switchboard.Strategy.Filter.member?/2, 
                                  {:only, [:show]} )
   end

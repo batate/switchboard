@@ -2,8 +2,8 @@ defmodule HaltStrategyTest do
   use ExUnit.Case
   require Switchboard
 
-  def inc(int), do: {:ok, int + 1}
-  def halt(int), do: {:halt, int}
+  def inc(int, _), do: {:ok, int + 1}
+  def halt(int, _), do: {:halt, int}
 
   def simple_plug, do: Switchboard.Plug.Fun.new func: :inc, module: __MODULE__
   def halt_plug, do: Switchboard.Plug.Fun.new func: :halt, module: __MODULE__

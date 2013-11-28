@@ -3,9 +3,9 @@ defmodule FilterStrategyTest do
   require Switchboard
 
   defmodule Controller do
-    def show(context, opts // []), do: {:ok, context.assign(:invoke, :show)}
-    def index(context, opts // []), do: {:ok, context.assign(:invoke, :index)}
-    def ensure(context, opts // []) do
+    def show(context, _), do: {:ok, context.assign(:invoke, :show)}
+    def index(context, _), do: {:ok, context.assign(:invoke, :index)}
+    def ensure(context, _) do
       {:ok, context.assign(:ensure, true)}
     end
   end
@@ -15,7 +15,7 @@ defmodule FilterStrategyTest do
                                     action_function: &(Switchboard.Context.get(:action, &1)) 
   end
 
-  def plug, do: Switchboard.Plug.Anon.new func: &({:ok, &1.assign(:plug_invoked, "true")})
+  def plug, do: Switchboard.Plug.Anon.new func: (fn(context, opts) -> ({:ok, context.assign(:plug_invoked, "true")}) end)
   def filter, do: strategy.new_filter( plug, {:only, [:show]})
   def show_context, do: Switchboard.Context.new.assign(:action, :show)
   def index_context, do: Switchboard.Context.new.assign(:action, :index)
@@ -23,6 +23,7 @@ defmodule FilterStrategyTest do
   
   def stack, do: Switchboard.Stack.new plugs: [filter, dispatch], strategy: strategy, module: Controller
   
+  test "should invoke plug", do: plug.call(show_context)
   
   test "should invoke before filter" do
     {_, context} = stack.call(show_context)

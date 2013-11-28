@@ -2,10 +2,10 @@ defmodule SwitchboardTest do
   use ExUnit.Case
   require Switchboard
 
-  def inc(int), do: {:ok, int + 1}
-  def double(int), do: {:ok, int * 2}
+  def inc(int, _), do: {:ok, int + 1}
+  def double(int, _), do: {:ok, int * 2}
 
-  def simple_plug, do: Switchboard.Plug.Anon.new func: &({:ok, &1 + 1})
+  def simple_plug, do: Switchboard.Plug.Anon.new func: (fn(x, _) -> {:ok, x + 1} end)
   def double_plug, do: Switchboard.Plug.Fun.new func: :double, module: __MODULE__
 
   defmodule WithPlugs do
