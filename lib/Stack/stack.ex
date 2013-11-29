@@ -82,23 +82,28 @@ defmodule Switchboard.Stack do
   
   
   def handler(nil, key), do: nil
-  def handler(stack, key) do
-    stack.handlers[key] || handler(stack.parent, key)
-  end
+  def handler(stack, key), do: (stack.handlers[key] || handler(stack.parent, key))
   
-  def ensure(stack, context) do
-    ensure_stack = stack.handlers[:ensure] 
+  def ensure(stack, context), do: handle_if(stack, context, :ensure)
+  
+  @doc """
+  Handle this code if a function of a stack exists on this level. 
+  
+  Useful for implementing features like 
+  """
+  def handle_if(stack, context, code) do
+    handler_stack = stack.handlers[code] 
     cond do
-      supports_function(stack, :ensure) -> 
-        {code, context} = call_ensure_function(stack, context)
-      ensure_stack != nil ->
-        call ensure_stack, context
+      supports_function(stack, code) -> 
+        {code, context} = call_handler_function(stack, context)
+      handler_stack != nil ->
+        call handler_stack, context
       true ->
         {:ok, context}
     end
   end
   
-  def call_ensure_function(stack, context) do
+  def call_handler_function(stack, context) do
     apply(stack.module, :ensure, ([context, []]))
   end
   
