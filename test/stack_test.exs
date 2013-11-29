@@ -24,7 +24,7 @@ defmodule StackTest do
 
   test "should set strategy" do
     changed = Switchboard.Stack.set_strategy( stack, Switchboard.Strategy.Halt )
-    assert changed.strategy.controller == nil
+    assert changed.strategy == Switchboard.Strategy.Halt
   end
   
   test "should access parent's handlers" do

@@ -52,7 +52,7 @@ defrecord Switchboard.Scheme.Filter,
   
   
   """
-  def new_filter(plug, membership, scheme) do
+  def new_filter(scheme, plug, membership) do
     Switchboard.Plug.IfPlug.new( plug, 
                                  scheme.action_function, 
                                  &Switchboard.Scheme.Filter.member?/2, 

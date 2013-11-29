@@ -10,16 +10,19 @@ defmodule FilterStrategyTest do
     end
   end
 
-  def strategy do 
-    Switchboard.Scheme.Filter.Scheme.new controller: Controller, 
+  def scheme do 
+    Switchboard.Scheme.Filter.Entity.new controller: Controller, 
                                     action_function: &(Switchboard.Context.get(:action, &1)) 
   end
+  
+  def strategy, do: Switchboard.Strategy.Halt
+  
 
   def plug, do: Switchboard.Plug.new_from_anon func: (fn(context, _) -> ({:ok, context.assign(:plug_invoked, "true")}) end)
-  def filter, do: strategy.new_filter( plug, {:only, [:show]})
+  def filter, do: Switchboard.Scheme.Filter.new_filter(scheme, plug, {:only, [:show]})
   def show_context, do: Switchboard.Context.new.assign(:action, :show)
   def index_context, do: Switchboard.Context.new.assign(:action, :index)
-  def dispatch, do: strategy.new_dispatcher
+  def dispatch, do: Switchboard.Scheme.Filter.new_dispatcher scheme
   
   def stack, do: Switchboard.Stack.Entity.new plugs: [filter, dispatch], strategy: strategy, module: Controller
   
