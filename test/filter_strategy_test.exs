@@ -11,7 +11,7 @@ defmodule FilterStrategyTest do
   end
 
   def strategy do 
-    Switchboard.Scheme.Filter.new controller: Controller, 
+    Switchboard.Scheme.Filter.Scheme.new controller: Controller, 
                                     action_function: &(Switchboard.Context.get(:action, &1)) 
   end
 

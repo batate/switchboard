@@ -23,7 +23,7 @@ defmodule StackTest do
   end
 
   test "should set strategy" do
-    changed = Switchboard.Stack.set_strategy( stack, Switchboard.Scheme.Filter.new )
+    changed = Switchboard.Stack.set_strategy( stack, Switchboard.Strategy.Halt )
     assert changed.strategy.controller == nil
   end
   

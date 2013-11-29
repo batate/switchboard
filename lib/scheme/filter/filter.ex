@@ -47,20 +47,14 @@ defrecord Switchboard.Scheme.Filter,
   """
 
   @doc """
-  This will eventually be broken out to a scheme. This refactor is in preparation for that move. 
-  """
-  def call_plug(plug, resp, _), do: Switchboard.Strategy.ForwardOther.call_plug(plug, resp)
-  def after_plugs(stack, code, context, _), do: Switchboard.Strategy.ForwardOther.after_plugs(stack, code, context)
-
-  @doc """
   Create an IfPlug that works as a filter for this strategy. 
   The wrapped plug will fire if the action from the context satisfies member?(action, membership)
   
   
   """
-  def new_filter(plug, membership, strategy) do
+  def new_filter(plug, membership, scheme) do
     Switchboard.Plug.IfPlug.new( plug, 
-                                 strategy.action_function, 
+                                 scheme.action_function, 
                                  &Switchboard.Scheme.Filter.member?/2, 
                                  membership )
   end
@@ -87,12 +81,12 @@ defrecord Switchboard.Scheme.Filter,
   
   
   """
-  def new_dispatcher(strategy) do
+  def new_dispatcher(scheme) do
     Switchboard.Plug.new_from_mod_fun func: :dispatch, 
                              module: Switchboard.Plug.Dispatcher, 
-                             options: [controller: strategy.controller, 
-                                       action_fun: strategy.action_function, 
-                                       args_fun: strategy.args_function || (fn(_) -> [] end) ]
+                             options: [controller: scheme.controller, 
+                                       action_fun: scheme.action_function, 
+                                       args_fun: scheme.args_function || (fn(_) -> [] end) ]
   end
 
 
@@ -115,3 +109,8 @@ defrecord Switchboard.Scheme.Filter,
   defp _member?(_, _), do: raise "unsupported filter keyword"
   
 end
+
+defrecord Switchboard.Scheme.Filter.Entity, 
+  controller: nil, 
+  action_function: nil, 
+  args_function: nil
