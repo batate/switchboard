@@ -16,8 +16,11 @@ defmodule Switchboard.Stack do
   Call the stack with the associated strategy. 
   """
   def call(stack, context, code // :ok) do 
-    {code, context} = call_plugs(stack, code, context)
-    stack.strategy.after_plugs(stack, code, context)
+    {code, context} = call_plugs(stack, code, context) 
+    {code, context} = stack.strategy.after_plugs(stack, code, context)
+    {_, context} = ensure stack, context
+    
+    {code, context}
   end
 
   defp call_plugs(stack, code, context) do 

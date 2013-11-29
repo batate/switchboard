@@ -47,27 +47,10 @@ defrecord Switchboard.Strategy.Filter,
   """
 
   @doc """
-  The DSL will build a stack, with a dispatcher at the end, and an :ensures handler. 
-  
-  The call function should traverse the stack using the basic rules for forward_other, 
-  with one exception:
-  
-  the return code is processed after executing the ensures stack. 
-  
-  
+  This will eventually be broken out to a scheme. This refactor is in preparation for that move. 
   """
-  def call_plug(plug, {:ok, context}, _), do: plug.(context)
-  def call_plug(plug, response, _), do: response
-  
-  def after_plugs(stack, code, context, _) do
-    {_, context} = Switchboard.Stack.ensure stack, context
-    after_ensure stack, code, context
-  end
-  
-  def after_ensure( _, :ok, context ), do: {:ok, context}
-  def after_ensure( _, :halt, context ), do: {:halt, context}
-  def after_ensure( stack, other, context ), do: Switchboard.Stack.handle( stack, other, context )
-  
+  def call_plug(plug, resp, _), do: Switchboard.Strategy.ForwardOther.call_plug(plug, resp)
+  def after_plugs(stack, code, context, _), do: Switchboard.Strategy.ForwardOther.after_plugs(stack, code, context)
 
   @doc """
   Create an IfPlug that works as a filter for this strategy. 
