@@ -21,7 +21,7 @@ defrecord Switchboard.Strategy.Halt, module: nil do
   Any return code other than :halt will be passed through. 
   
   """
-  def call({code, context}, stack), do: _call({code, context}, stack.plugs)
+  def call(code, context, stack), do: _call({code, context}, stack.plugs)
   
   defp _call({:halt, context}, _), do: {:halt, context}
   defp _call(code, []), do: code

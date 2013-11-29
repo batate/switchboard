@@ -56,7 +56,7 @@ defrecord Switchboard.Strategy.Filter,
   
   
   """
-  def call({code, context}, stack, strategy) do
+  def call(code, context, stack, strategy) do
     {code, context} = Switchboard.Stack.call_while_ok(stack, {code, context})
     {_, context} = Switchboard.Stack.ensure stack, context
     case {code, context} do

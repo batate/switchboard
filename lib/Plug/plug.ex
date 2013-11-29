@@ -33,7 +33,7 @@ defmodule Switchboard.Plug do
   def invoke_from_module_plug(context, opts) do
     module = opts[:module]
     options = opts[:options] || Keyword.new
-    Switchboard.Stack.call module.stack, :ok, context
+    Switchboard.Stack.call module.stack, context
   end
   
   

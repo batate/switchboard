@@ -23,32 +23,32 @@ defmodule PlugFactoryTest do
   test "should invoke function plug from atom" do
     new_stack = plug( stack, :double )
     assert Enum.count(new_stack.plugs) == 1
-    assert Switchboard.Stack.call(new_stack, :ok, 1) == {:ok, 2}
+    assert Switchboard.Stack.call(new_stack, 1) == {:ok, 2}
   end
   
   test "should invoke handler plug from atom" do
     named_plug_stack = stack.update name: "invoking handler :trips"
     new_stack_plug = plug( named_plug_stack, :trips )
     assert Enum.count(new_stack_plug.plugs) == 1
-    assert Switchboard.Stack.call(new_stack_plug, :ok, 1) == {:ok, 3}
+    assert Switchboard.Stack.call(new_stack_plug, 1) == {:ok, 3}
   end
   
   test "should invoke module plug" do
     new_stack = plug( stack, Plugs )
     assert Enum.count(new_stack.plugs) == 1
-    assert Switchboard.Stack.call(new_stack, :ok, 1) == {:ok, 9}
+    assert Switchboard.Stack.call(new_stack, 1) == {:ok, 9}
   end
   
   test "should invoke function plug" do
     new_stack = plug( stack, &__MODULE__.inc/2 )
     assert Enum.count(new_stack.plugs) == 1
-    assert Switchboard.Stack.call(new_stack, :ok, 1) == {:ok, 2}
+    assert Switchboard.Stack.call(new_stack, 1) == {:ok, 2}
   end
   
   test "should invoke tuple plug" do
     new_stack = plug( stack, {__MODULE__, :inc} )
     assert Enum.count(new_stack.plugs) == 1
-    assert Switchboard.Stack.call(new_stack, :ok, 1) == {:ok, 2}
+    assert Switchboard.Stack.call(new_stack, 1) == {:ok, 2}
   end
   
   

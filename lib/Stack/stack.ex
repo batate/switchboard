@@ -15,7 +15,7 @@ defmodule Switchboard.Stack do
   @doc """
   Call the stack with the associated strategy. 
   """
-  def call(stack, code, context), do: stack.strategy.call( {code, context}, stack)
+  def call(stack, context, code // :ok), do: stack.strategy.call( code, context, stack)
   
   @doc """
   Returns a new stack with a plug appended to the end of plugs.
@@ -34,11 +34,17 @@ defmodule Switchboard.Stack do
   
   def set_strategy(stack, strategy), do: stack.update( strategy: strategy )
   
-  def call_while_ok(stack, {code, context}), do: _call_while_ok({code, context}, stack.plugs)
-    
-  defp _call_while_ok({:ok, context}, []), do: {:ok, context}
-  defp _call_while_ok({:ok, context}, [plug|tail]), do: _call_while_ok(plug.(context), tail) 
-  defp _call_while_ok({code, context}, _), do: {code, context}
+  def call_while_ok(stack, {code, context}), do: Enum.reduce( stack.plugs, {code, context}, &call_plug/2 )
+
+  def call_plug(plug, {:ok, context}), do: plug.(context)
+  def call_plug(plug, {other, context}), do: {other, context}
+  
+  
+  # def call_while_ok(stack, {code, context}), do: _call_while_ok({code, context}, stack.plugs)
+  #   
+  # defp _call_while_ok({:ok, context}, []), do: {:ok, context}
+  # defp _call_while_ok({:ok, context}, [plug|tail]), do: _call_while_ok(plug.(context), tail) 
+  # defp _call_while_ok({code, context}, _), do: {code, context}
   
   @doc """
   process a handle with the given code. 
@@ -63,7 +69,7 @@ defmodule Switchboard.Stack do
     end
   end
   defp _handle(code, context, nil), do: (raise "Unsupported handler: #{code}")
-  defp _handle(code, context, stack), do: call( stack, :ok, context)
+  defp _handle(code, context, stack), do: call( stack, context)
   
   
   
@@ -76,15 +82,15 @@ defmodule Switchboard.Stack do
     ensure_stack = stack.handlers[:ensure] 
     cond do
       supports_function(stack, :ensure) -> 
-        {code, context} = fire_ensure_function(stack, context)
+        {code, context} = call_ensure_function(stack, context)
       ensure_stack != nil ->
-        Switchboard.Stack.call ensure_stack, :ok, context
+        call ensure_stack, context
       true ->
         {:ok, context}
     end
   end
   
-  def fire_ensure_function(stack, context) do
+  def call_ensure_function(stack, context) do
     apply(stack.module, :ensure, ([context, []]))
   end
   
