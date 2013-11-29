@@ -26,22 +26,22 @@ defmodule FilterStrategyTest do
   test "should invoke plug", do: plug.(show_context)
   
   test "should invoke before filter" do
-    {_, context} = Switchboard.Stack.call(stack, {:ok, show_context})
+    {_, context} = Switchboard.Stack.call(stack, :ok, show_context)
     assert "true" == context.assigns[:plug_invoked]
   end
   
   test "should not before filter" do
-    {_, context} = Switchboard.Stack.call(stack, {:ok, index_context})
+    {_, context} = Switchboard.Stack.call(stack, :ok, index_context)
     assert nil == context.assigns[:plug_invoked]
   end
   
   test "should dispatch" do
-    {_, context} = Switchboard.Stack.call(stack, {:ok, index_context})
+    {_, context} = Switchboard.Stack.call(stack, :ok, index_context)
     assert context.assigns[:invoke] == :index
   end
   
   test "should invoke ensure" do
-    {_, context} = Switchboard.Stack.call(stack, {:ok, index_context})
+    {_, context} = Switchboard.Stack.call(stack, :ok, index_context)
     assert context.assigns[:ensure] == true
   end
   

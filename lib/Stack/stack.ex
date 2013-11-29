@@ -15,10 +15,8 @@ defmodule Switchboard.Stack do
   @doc """
   Call the stack with the associated strategy. 
   """
-  def call(stack, {code, context}), do: stack.strategy.call( {code, context}, stack)
+  def call(stack, code, context), do: stack.strategy.call( {code, context}, stack)
   
-  def call(stack, tuple), do: raise "********************Got a call with tuple #{inspect tuple}**************************"
-
   @doc """
   Returns a new stack with a plug appended to the end of plugs.
   """
@@ -65,7 +63,7 @@ defmodule Switchboard.Stack do
     end
   end
   defp _handle(code, context, nil), do: (raise "Unsupported handler: #{code}")
-  defp _handle(code, context, stack), do: call( stack, {:ok, context})
+  defp _handle(code, context, stack), do: call( stack, :ok, context)
   
   
   
@@ -80,7 +78,7 @@ defmodule Switchboard.Stack do
       supports_function(stack, :ensure) -> 
         {code, context} = fire_ensure_function(stack, context)
       ensure_stack != nil ->
-        Switchboard.Stack.call ensure_stack, {:ok, context}
+        Switchboard.Stack.call ensure_stack, :ok, context
       true ->
         {:ok, context}
     end

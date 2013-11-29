@@ -14,10 +14,10 @@ defmodule HaltStrategyTest do
   def haltless_stack, do: Switchboard.Stack.Entity.new plugs: [simple_plug, simple_plug]
   
   test "should halt stack",
-    do: assert( Switchboard.Stack.call(halt_stack, {:ok, 0}) == {:halt, 1} )
+    do: assert( Switchboard.Stack.call(halt_stack, :ok, 0) == {:halt, 1} )
     
   test "should not halt stack", 
-    do: assert( Switchboard.Stack.call(haltless_stack, {:ok, 0}) == {:ok, 2} )
+    do: assert( Switchboard.Stack.call(haltless_stack, :ok, 0) == {:ok, 2} )
   
   
 end

@@ -25,10 +25,10 @@ defmodule ForwardOtherStrategyTest do
   def module_plug, do: Switchboard.Plug.new_from_module(module: WithPlugs)
   
   test "should halt stack",
-    do: assert( Switchboard.Stack.call(halt_stack, {:ok, 0}) == {:halt, 1} )
+    do: assert( Switchboard.Stack.call(halt_stack, :ok, 0) == {:halt, 1} )
     
   test "should call stack",
-    do: assert( Switchboard.Stack.call(stack, {:ok, 2}) == {:ok, 12} )
+    do: assert( Switchboard.Stack.call(stack, :ok, 2) == {:ok, 12} )
 
   test "should call module plug",
     do: assert( module_plug.(2) == {:ok, 6} )
