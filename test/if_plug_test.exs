@@ -14,7 +14,7 @@ defmodule IfPlugTest do
   def ifplug do 
     Switchboard.Plug.IfPlug.new( check_plug, 
                                  &(Switchboard.Context.get :action, &1), 
-                                 &Switchboard.Strategy.Filter.member?/2, 
+                                 &Switchboard.Scheme.Filter.member?/2, 
                                  {:only, [:show]} )
   end
   

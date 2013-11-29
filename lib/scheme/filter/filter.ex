@@ -1,4 +1,4 @@
-defrecord Switchboard.Strategy.Filter, 
+defrecord Switchboard.Scheme.Filter, 
   controller: nil, 
   action_function: nil, 
   args_function: nil do
@@ -61,7 +61,7 @@ defrecord Switchboard.Strategy.Filter,
   def new_filter(plug, membership, strategy) do
     Switchboard.Plug.IfPlug.new( plug, 
                                  strategy.action_function, 
-                                 &Switchboard.Strategy.Filter.member?/2, 
+                                 &Switchboard.Scheme.Filter.member?/2, 
                                  membership )
   end
   
