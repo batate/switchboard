@@ -5,7 +5,7 @@ defmodule FilterStrategyTest do
   defmodule Controller do
     def show(context, _), do: {:ok, context.assign(:invoke, :show)}
     def index(context, _), do: {:ok, context.assign(:invoke, :index)}
-    def ensure(context, opts) do
+    def ensure(context, _) do
       {:ok, context.assign(:ensure, true)}
     end
   end

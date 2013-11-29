@@ -56,17 +56,17 @@ defrecord Switchboard.Strategy.Filter,
   
   
   """
-  def call(code, context, stack, strategy) do
-    {code, context} = Switchboard.Stack.call_while_ok(stack, {code, context})
+  def call_plug(plug, {:ok, context}, _), do: plug.(context)
+  def call_plug(plug, response, _), do: response
+  
+  def after_plugs(stack, code, context, _) do
     {_, context} = Switchboard.Stack.ensure stack, context
-    case {code, context} do
-      { :ok, context } -> {:ok, context}
-      { :halt, context } -> {:halt, context}
-      {other, context} -> Switchboard.Stack.handle stack, other, context
-    end
+    after_ensure stack, code, context
   end
-
-
+  
+  def after_ensure( _, :ok, context ), do: {:ok, context}
+  def after_ensure( _, :halt, context ), do: {:halt, context}
+  def after_ensure( stack, other, context ), do: Switchboard.Stack.handle( stack, other, context )
   
 
   @doc """

@@ -1,17 +1,17 @@
 defmodule Switchboard.Strategy.ForwardOther do
   
-  @doc """
-  Calls this stack. 
-  
-  Call all of the plugs in this stack, in order, until the code is something other than :ok. 
-  All codes other than :ok will be handled by the stack handler 
-  
+  @moduledoc """
+  Halt if any plug returns anything other than :ok
+  :halt will halt the stack and return :halt
+  :other will forward to the next object in the stack
   """
-  def call(code, context, stack) do
-     
-    {code, context} = Switchboard.Stack.call_while_ok(stack, {code, context}) 
-    result = Switchboard.Stack.handle stack, code, context
-    result
-  end
+  
+  @doc """
+  Call a single plug, ignoring what happens after :other
+  """
+  def call_plug(plug, {:ok, context}), do: plug.(context)
+  def call_plug(plug, response), do: response
+  
+  def after_plugs(stack, other, context), do: Switchboard.Stack.handle( stack, other, context )
   
 end

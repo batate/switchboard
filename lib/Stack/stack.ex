@@ -15,7 +15,21 @@ defmodule Switchboard.Stack do
   @doc """
   Call the stack with the associated strategy. 
   """
-  def call(stack, context, code // :ok), do: stack.strategy.call( code, context, stack)
+  def call(stack, context, code // :ok) do 
+    {code, context} = call_plugs(stack, code, context)
+    stack.strategy.after_plugs(stack, code, context)
+  end
+
+  defp call_plugs(stack, code, context) do 
+    Enum.reduce( stack.plugs, 
+                 {code, context}, 
+                 &(stack.strategy.call_plug(&1, &2)))
+  end
+
+  def call_plug(plug, {:ok, context}), do: plug.(context)
+  def call_plug(plug, {other, context}), do: {other, context}
+  
+
   
   @doc """
   Returns a new stack with a plug appended to the end of plugs.
@@ -34,17 +48,6 @@ defmodule Switchboard.Stack do
   
   def set_strategy(stack, strategy), do: stack.update( strategy: strategy )
   
-  def call_while_ok(stack, {code, context}), do: Enum.reduce( stack.plugs, {code, context}, &call_plug/2 )
-
-  def call_plug(plug, {:ok, context}), do: plug.(context)
-  def call_plug(plug, {other, context}), do: {other, context}
-  
-  
-  # def call_while_ok(stack, {code, context}), do: _call_while_ok({code, context}, stack.plugs)
-  #   
-  # defp _call_while_ok({:ok, context}, []), do: {:ok, context}
-  # defp _call_while_ok({:ok, context}, [plug|tail]), do: _call_while_ok(plug.(context), tail) 
-  # defp _call_while_ok({code, context}, _), do: {code, context}
   
   @doc """
   process a handle with the given code. 
@@ -68,6 +71,8 @@ defmodule Switchboard.Stack do
         _handle other, context, handler(stack, other)
     end
   end
+
+  # no more parents, so the handler is unsupported
   defp _handle(code, context, nil), do: (raise "Unsupported handler: #{code}")
   defp _handle(code, context, stack), do: call( stack, context)
   
