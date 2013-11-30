@@ -25,10 +25,10 @@ defmodule Switchboard.Plug.Factory do
   ...
   
   """
-  def plug(stack, plug_spec) do
-    new_plug = cond do
+  def build_plug(module, plug_spec) do
+    cond do
       is_atom plug_spec -> 
-        create_from_atom plug_spec, stack
+        create_from_atom plug_spec, module
       is_tuple plug_spec ->
         create_from_tuple plug_spec
       is_function plug_spec ->
@@ -36,8 +36,6 @@ defmodule Switchboard.Plug.Factory do
       true ->
         raise "Unsupported plug format"
     end
-    
-    Switchboard.Stack.add_plug stack, new_plug
   end
   
   defp create_from_tuple({module, function}) do
@@ -45,12 +43,12 @@ defmodule Switchboard.Plug.Factory do
   end
 
   
-  defp create_from_atom(plug_spec, stack) do
+  defp create_from_atom(plug_spec, module) do
     cond do
       is_elixir_module(plug_spec) -> 
         Switchboard.Plug.new_from_module( module: plug_spec )
       true ->
-        Switchboard.Plug.new_from_handler handler_name: plug_spec, stack: stack
+        Switchboard.Plug.new_from_handler handler_name: plug_spec, module: module
     end
   end
   

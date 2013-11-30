@@ -1,57 +1,64 @@
 defmodule PlugFactoryTest do
   use ExUnit.Case
   require Switchboard
-  import Switchboard.Plug.Factory
 
   def inc(int, _), do: {:ok, int + 1}
-  
-  
-  def simple_plug, do: Switchboard.Plug.new_from_anon func: (fn(x, _) -> {:ok, x  * 3} end)
+
+  defmodule Double do
+    def stack do
+      Switchboard.Stack.Entity.new plugs: [
+        Switchboard.Plug.Factory.build_plug( __MODULE__, {PlugFactoryTest, :inc}), 
+        Switchboard.Plug.Factory.build_plug( __MODULE__, {PlugFactoryTest, :inc})
+      ]
+    end
+    
+    def inc(context, _), do: {:ok, context + 1}
+  end
 
   defmodule Plugs do
     def double(int, _), do: {:ok, int * 2}
     
     def stack do 
       Switchboard.Stack.Entity.new(
-        plugs: [PlugFactoryTest.simple_plug, PlugFactoryTest.simple_plug] )
-      end
+        module: __MODULE__, 
+        plugs: [ 
+          Switchboard.Plug.Factory.build_plug(Plugs, :double), 
+          Switchboard.Plug.Factory.build_plug(Plugs, :double ) ], 
+        handlers: [double_inc: Double.stack] )
+    end
+    
+    def call(context, _), do: Switchboard.Stack.call(stack, context, :ok)
+  end
+
+  def module_plug, do: Switchboard.Plug.Factory.build_plug(Plugs, Double)
+  
+  test "should invoke basic plug" do
+    plug = Enum.first(Plugs.stack.plugs)
+    assert plug.(1) == {:ok, 2}
   end
   
-  def stack, do: Switchboard.Stack.Entity.new module: Plugs, handlers: [trips: handler]
-  def handler, do: Switchboard.Stack.Entity.new plugs: [simple_plug], name: :trips
-  
-  test "should invoke function plug from atom" do
-    new_stack = plug( stack, :double )
-    assert Enum.count(new_stack.plugs) == 1
-    assert Switchboard.Stack.call(new_stack, 1) == {:ok, 2}
+  test "should invoke anon function plug" do
+    plug = Switchboard.Plug.Factory.build_plug( PlugFactoryTest, &PlugFactoryTest.inc/2 ) 
+    assert plug.(1) == {:ok, 2}
   end
   
-  test "should invoke handler plug from atom" do
-    named_plug_stack = stack.update name: "invoking handler :trips"
-    new_stack_plug = plug( named_plug_stack, :trips )
-    assert Enum.count(new_stack_plug.plugs) == 1
-    assert Switchboard.Stack.call(new_stack_plug, 1) == {:ok, 3}
+  test "should invoke mod/function plug" do
+    plug = Switchboard.Plug.Factory.build_plug( PlugFactoryTest, {PlugFactoryTest, :inc} ) 
+    assert plug.(1) == {:ok, 2}
   end
   
   test "should invoke module plug" do
-    new_stack = plug( stack, Plugs )
-    assert Enum.count(new_stack.plugs) == 1
-    assert Switchboard.Stack.call(new_stack, 1) == {:ok, 9}
+    plug = Switchboard.Plug.Factory.build_plug( PlugFactoryTest, Plugs ) 
+    assert plug.(1) == {:ok, 4}
   end
   
-  test "should invoke function plug" do
-    new_stack = plug( stack, &__MODULE__.inc/2 )
-    assert Enum.count(new_stack.plugs) == 1
-    assert Switchboard.Stack.call(new_stack, 1) == {:ok, 2}
+  test "should invoke atom handler plug as function" do
+    plug = Switchboard.Plug.Factory.build_plug( Plugs, :double ) 
+    assert plug.(2) == {:ok, 4}
   end
   
-  test "should invoke tuple plug" do
-    new_stack = plug( stack, {__MODULE__, :inc} )
-    assert Enum.count(new_stack.plugs) == 1
-    assert Switchboard.Stack.call(new_stack, 1) == {:ok, 2}
+  test "should invoke atom handler plug as stack" do
+    plug = Switchboard.Plug.Factory.build_plug( Plugs, :double_inc ) 
+    assert plug.(1) == {:ok, 3}
   end
-  
-  
-  
-  
 end

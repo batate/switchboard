@@ -20,13 +20,18 @@ defmodule Switchboard.Plug do
   end
   
   def handle_stack_from_plug(context, opts // Keyword.new) do
-    stack = opts[:stack]
+    module = opts[:module]
+    if nil?( module ), do: no_module
+
+    stack = module.stack
     handler_name = opts[:handler_name]
     if nil?( handler_name), do: no_handler
+
     Switchboard.Stack.handle(stack, handler_name, context)
   end
 
   defp no_handler, do: raise( "You attempted to call a handler plug with no handler")
+  defp no_module, do: raise( "You attempted to call a handler plug with no module")
   
   def new_from_module(opts), do: &invoke_from_module_plug(&1, opts)
   
