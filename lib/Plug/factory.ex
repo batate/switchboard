@@ -25,7 +25,8 @@ defmodule Switchboard.Plug.Factory do
   ...
   
   """
-  def build_plug(module, plug_spec) do
+  def build_plug([module, plug_spec, opts]), do: build_plug(module, plug_spec, opts)
+  def build_plug(module, plug_spec, opts // []) do
     cond do
       is_atom plug_spec -> 
         create_from_atom plug_spec, module
