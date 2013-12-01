@@ -24,33 +24,8 @@ defmodule Switchboard.Stack do
   end
 
   defp call_plugs(stack, code, context) do 
-    Enum.reduce( stack.plugs, 
-                 {code, context}, 
-                 &(stack.strategy.call_plug(&1, &2)))
+    Enum.reduce( stack.plugs, {code, context}, &(stack.strategy.call_plug(&1, &2)))
   end
-
-  def call_plug(plug, {:ok, context}), do: plug.(context)
-  def call_plug(plug, {other, context}), do: {other, context}
-  
-
-  
-  @doc """
-  Returns a new stack with a plug appended to the end of plugs.
-  """
-  def add_plug(stack, plug), do: stack.update( plugs: stack.plugs ++ [plug])
-
-  
-  
-  @doc """
-  Add a new handler to the stack
-  """
-  def add_handler(stack, handler) do
-    if handler.name == nil, do: raise "A stack must have a name to be a handler"
-    stack.update handlers: (stack.handlers |> Keyword.put(binary_to_atom( handler.name ), handler))
-  end
-  
-  def set_strategy(stack, strategy), do: stack.update( strategy: strategy )
-  
   
   @doc """
   process a handle with the given code. 

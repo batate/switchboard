@@ -16,17 +16,6 @@ defmodule StackTest do
   
   def stack_with_module, do: Switchboard.Stack.Entity.new module: FunctionHandlerTest, plugs: []
 
-  test "should add a handler to stack" do
-    added = Switchboard.Stack.add_handler(stack, handler)
-    assert (added.handlers |> Enum.count) == 1
-    assert added.handlers[ :inc ].name == "inc"
-  end
-
-  test "should set strategy" do
-    changed = Switchboard.Stack.set_strategy( stack, Switchboard.Strategy.Halt )
-    assert changed.strategy == Switchboard.Strategy.Halt
-  end
-  
   test "should access parent's handlers" do
     assert Switchboard.Stack.handler(child_stack, :inc) == handler
   end
