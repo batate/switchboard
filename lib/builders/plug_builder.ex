@@ -7,6 +7,7 @@ defmodule Switchboard.PlugBuilder do
       require Switchboard
       import Switchboard.PlugBuilder
       @plugs []
+      @strategy Switchboard.Strategy.ForwardOther
       @handlers []
       @parent nil
       @before_compile Switchboard.PlugBuilder
@@ -19,16 +20,37 @@ defmodule Switchboard.PlugBuilder do
     end
   end
   
+  defmacro on(name, module) do
+    quote do
+      @handlers [ [unquote(name), unquote(module)] | @handlers ]
+    end
+  end
+
+  defmacro strategy(s) do
+    quote do: @strategy unquote(s)
+  end
+  
   defmacro __before_compile__(env) do
-    plug_lists = Enum.reverse Module.get_attribute(env.module, :plugs)
-    
+    plug_list = Enum.reverse Module.get_attribute(env.module, :plugs)
+    handler_list = Module.get_attribute(env.module, :handlers)
+    IO.puts inspect(handler_list)
+    st = Module.get_attribute(env.module, :strategy)
     quote do
       def plugs do 
-        Enum.map unquote( plug_lists ), &(Switchboard.Plug.Factory.build_plug/1)
+        Enum.map unquote( plug_list ), &(Switchboard.Plug.Factory.build_plug/1)
       end
       
-      def stack do
-        Switchboard.Stack.Entity.new(plugs: plugs, module: __MODULE__)
+      def stack(parent // nil) do
+        Switchboard.Stack.Entity.new(
+          plugs: plugs, 
+          module: __MODULE__, 
+          handlers: handlers, 
+          strategy: unquote(st), 
+          parent: parent )
+      end
+      
+      def handlers do
+        Enum.map unquote( handler_list ), &(Switchboard.Stack.build_handler/1)
       end
     end
   end

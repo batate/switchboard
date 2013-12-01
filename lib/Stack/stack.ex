@@ -26,6 +26,24 @@ defmodule Switchboard.Stack do
   defp call_plugs(stack, code, context) do 
     Enum.reduce( stack.plugs, {code, context}, &(stack.strategy.call_plug(&1, &2)))
   end
+
+  @doc """
+  Conveninece method for DSL to buid a handler
+  """
+  def build_handler([name, module]), do: build_handler(name, module)
+  def build_handler(name, module) do
+    strategy = case function_exported?(module, :strategy, 0) do
+      true -> module.strategy
+      false -> Switchboard.Strategy.ForwardOther
+    end 
+    
+    if !module, do: raise( "The module for a handler can't be nil" )
+    if !name , do: raise( "The name for a handler can't be nil" )
+    if !function_exported?(module, :plugs, 0 ), do: raise( "All handlers must support plugs/0" )
+    if !function_exported?(module, :stack, 0 ), do: raise( "All handlers must support stack/0" )
+    h = Switchboard.Stack.Entity.new name: name, plugs: module.plugs, module: module, strategy: strategy
+    {name, h}
+  end
   
   @doc """
   process a handle with the given code. 
@@ -35,7 +53,6 @@ defmodule Switchboard.Stack do
   - failing that, will try to invoke the handler on the stack with that name
   - failing that, will move to the parent and go through the same process
   - if no handler is found on the parents, will raise an exception
-  
   
   """
   def handle(stack, :ok, context), do: {:ok, context}

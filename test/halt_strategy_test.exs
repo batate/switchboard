@@ -19,6 +19,4 @@ defmodule HaltStrategyTest do
     
   test "should not halt stack", 
     do: assert( Switchboard.Stack.call(haltless_stack, 0) == {:ok, 2} )
-  
-  
 end

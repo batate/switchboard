@@ -24,7 +24,8 @@ defmodule Switchboard.Plug.IfPlug do
   end
   
   def call(context, options) do
-    test = context |> options[:action_fun].() |> options[:comparison_fun].( options[:comparison_args] )
+    test = context |> options[:action_fun].() |> 
+           options[:comparison_fun].( options[:comparison_args] )
     _call options[:plug], context, test
   end
   
