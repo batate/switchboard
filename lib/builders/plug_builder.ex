@@ -33,19 +33,18 @@ defmodule Switchboard.PlugBuilder do
   defmacro __before_compile__(env) do
     plug_list = Enum.reverse Module.get_attribute(env.module, :plugs)
     handler_list = Module.get_attribute(env.module, :handlers)
-    IO.puts inspect(handler_list)
-    st = Module.get_attribute(env.module, :strategy)
+    strat = Module.get_attribute(env.module, :strategy)
     quote do
-      def plugs do 
-        Enum.map unquote( plug_list ), &(Switchboard.Plug.Factory.build_plug/1)
+      def plugs(parent // nil) do 
+        Enum.map unquote( plug_list ), &(Switchboard.Plug.Factory.build_plug(&1, parent))
       end
       
       def stack(parent // nil) do
         Switchboard.Stack.Entity.new(
-          plugs: plugs, 
+          plugs: plugs(parent), 
           module: __MODULE__, 
           handlers: handlers, 
-          strategy: unquote(st), 
+          strategy: unquote(strat), 
           parent: parent )
       end
       

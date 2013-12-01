@@ -8,7 +8,7 @@ defmodule HaltStrategyTest do
   def simple_plug, do: Switchboard.Plug.new_from_mod_fun func: :inc, module: __MODULE__
   def halt_plug, do: Switchboard.Plug.new_from_mod_fun func: :halt, module: __MODULE__
   def halt_stack do
-    stack = Switchboard.Stack.Entity.new( 
+    Switchboard.Stack.Entity.new( 
       plugs: [simple_plug, halt_plug, simple_plug], 
       strategy: Switchboard.Strategy.Halt )
   end

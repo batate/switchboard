@@ -23,7 +23,7 @@ defmodule Switchboard.Plug do
     module = opts[:module]
     if nil?( module ), do: no_module
 
-    stack = module.stack
+    stack = module.stack(opts[:parent])
     handler_name = opts[:handler_name]
     if nil?( handler_name), do: no_handler
 

@@ -22,7 +22,7 @@ defmodule PlugBuilderTest do
 
     on :triple_it, Triple
     
-    def inc(context, opts), do: {:ok, context + 1}
+    def inc(context, _), do: {:ok, context + 1}
     def double(context, _), do: {:ok, context * 2}
     def clear(_, _), do: {:ok, 0}
 
