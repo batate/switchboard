@@ -1,5 +1,6 @@
 defmodule IfPlugTest do
   use ExUnit.Case
+  import Should
   
   
   def show_context, do: Switchboard.Context.new assigns: [action: :show]
@@ -18,12 +19,12 @@ defmodule IfPlugTest do
                                  {:only, [:show]} )
   end
   
-  test "should fire ifplug based on action being in only" do
+  should "fire ifplug based on action being in only" do
     {:ok, result} = ifplug.( show_context )
     assert result.get( :check ) == "function was called"
   end
   
-  test "should not fire ifplug based on action not being in only" do
+  should "not fire ifplug based on action not being in only" do
     {:ok, result} = ifplug.( index_context )
     assert result.get( :check ) == nil
   end

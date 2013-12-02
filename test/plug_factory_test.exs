@@ -1,5 +1,6 @@
 defmodule PlugFactoryTest do
   use ExUnit.Case
+  import Should
   require Switchboard
 
   def inc(int, _), do: {:ok, int + 1}
@@ -32,32 +33,32 @@ defmodule PlugFactoryTest do
 
   def module_plug, do: Switchboard.Plug.Factory.build_plug(Plugs, Double, [])
   
-  test "should invoke basic plug" do
+  should "invoke basic plug" do
     plug = Enum.first(Plugs.stack.plugs)
     assert plug.(1) == {:ok, 2}
   end
   
-  test "should invoke anon function plug" do
+  should "invoke anon function plug" do
     plug = Switchboard.Plug.Factory.build_plug( PlugFactoryTest, &PlugFactoryTest.inc/2, [] ) 
     assert plug.(1) == {:ok, 2}
   end
   
-  test "should invoke mod/function plug" do
+  should "invoke mod/function plug" do
     plug = Switchboard.Plug.Factory.build_plug( PlugFactoryTest, {PlugFactoryTest, :inc}, [] ) 
     assert plug.(1) == {:ok, 2}
   end
   
-  test "should invoke module plug" do
+  should "invoke module plug" do
     plug = Switchboard.Plug.Factory.build_plug( PlugFactoryTest, Plugs, [] ) 
     assert plug.(1) == {:ok, 4}
   end
   
-  test "should invoke atom handler plug as function" do
+  should "invoke atom handler plug as function" do
     plug = Switchboard.Plug.Factory.build_plug( Plugs, :double, [] ) 
     assert plug.(2) == {:ok, 4}
   end
   
-  test "should invoke atom handler plug as stack" do
+  should "invoke atom handler plug as stack" do
     plug = Switchboard.Plug.Factory.build_plug( Plugs, :double_inc, [] ) 
     assert plug.(1) == {:ok, 3}
   end

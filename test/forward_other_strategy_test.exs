@@ -1,5 +1,6 @@
 defmodule ForwardOtherStrategyTest do
   use ExUnit.Case
+  import Should
   require Switchboard
 
   def inc(int, _), do: {:ok, int + 1}
@@ -24,16 +25,16 @@ defmodule ForwardOtherStrategyTest do
   
   def module_plug, do: Switchboard.Plug.new_from_module(module: WithPlugs)
   
-  test "should halt stack",
+  should "halt stack",
     do: assert( Switchboard.Stack.call(halt_stack, 0) == {:halt, 1} )
     
-  test "should call stack",
+  should "call stack",
     do: assert( Switchboard.Stack.call(stack, 2) == {:ok, 12} )
 
-  test "should call module plug",
+  should "call module plug",
     do: assert( module_plug.(2) == {:ok, 6} )
     
-  test "should handle tuple" do
+  should "handle tuple" do
     assert( Switchboard.Stack.handle(stack_with_handler, :double, 1) == {:ok, 2})
   end
 end

@@ -1,7 +1,8 @@
+
 defmodule PlugBuilderTest do
   use ExUnit.Case
+  import Should
   require Switchboard
-  require Switchboard.PlugBuilder
 
 
   defmodule Triple do
@@ -28,21 +29,21 @@ defmodule PlugBuilderTest do
 
   end
   
-  test "should define plugs" do
+  should "define plugs" do
     assert Enum.count( TestBoard.plugs ) == 3
   end
   
-  test "should define stack with plugs" do
+  should "define stack with plugs" do
     stack = TestBoard.stack
     assert Enum.count( stack.plugs ) == 3
     assert stack.module == TestBoard
     assert Switchboard.Stack.call( stack, 1) == {:ok, 2}
   end
   
-  test "should assign a strategy", do: 
+  should "assign a strategy", do: 
     assert TestBoard.stack.strategy == Switchboard.Strategy.Halt
     
-  test "should define a handler", do:
+  should "define a handler", do:
     assert Enum.count(TestBoard.stack.handlers) == 1
   
 end

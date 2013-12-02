@@ -1,5 +1,6 @@
 defmodule HaltStrategyTest do
   use ExUnit.Case
+  import Should
   require Switchboard
 
   def inc(int, _), do: {:ok, int + 1}
@@ -14,9 +15,9 @@ defmodule HaltStrategyTest do
   end
   def haltless_stack, do: Switchboard.Stack.Entity.new plugs: [simple_plug, simple_plug]
   
-  test "should halt stack",
+  should "halt stack",
     do: assert( Switchboard.Stack.call(halt_stack, 0) == {:halt, 1} )
     
-  test "should not halt stack", 
+  should "not halt stack", 
     do: assert( Switchboard.Stack.call(haltless_stack, 0) == {:ok, 2} )
 end

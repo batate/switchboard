@@ -1,5 +1,6 @@
 defmodule FilterStrategyTest do
   use ExUnit.Case
+  import Should
   require Switchboard
 
   defmodule Controller do
@@ -26,24 +27,24 @@ defmodule FilterStrategyTest do
   
   def stack, do: Switchboard.Stack.Entity.new plugs: [filter, dispatch], strategy: strategy, module: Controller
   
-  # test "should invoke plug", do: plug.(show_context)
+  # should "invoke plug", do: plug.(show_context)
   # 
-  # test "should invoke before filter" do
+  # should "invoke before filter" do
   #   {_, context} = Switchboard.Stack.call(stack, show_context)
   #   assert "true" == context.assigns[:plug_invoked]
   # end
   # 
-  # test "should not before filter" do
+  # should "not before filter" do
   #   {_, context} = Switchboard.Stack.call(stack, index_context)
   #   assert nil == context.assigns[:plug_invoked]
   # end
   # 
-  # test "should dispatch" do
+  # should "dispatch" do
   #   {_, context} = Switchboard.Stack.call(stack, index_context)
   #   assert context.assigns[:invoke] == :index
   # end
   # 
-  test "should invoke ensure" do
+  should "invoke ensure" do
     {_, context} = Switchboard.Stack.call(stack, index_context)
     assert context.assigns[:ensure] == true
   end

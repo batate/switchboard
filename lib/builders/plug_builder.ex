@@ -1,5 +1,12 @@
-# TODO This builder will need to work out how to get the parent in child stacks. 
-# TODO handler plugs should be dynamic, by name. They take a stack; should pull the stack from the module at runtime. 
+# Replace handler with name/value pairs. That's all that's needed 
+# handler chain gets rolled up with build step. 
+# Parents can fall out. Ensure chain can be called after initial stack. 
+# Build-chain:
+#   Build out plugs as you go
+#   Replace plug macro with stack macro
+#   Each build traverses its plug chain, instantiating its plugs
+# 
+# TODO This 
  
 defmodule Switchboard.PlugBuilder do
   defmacro __using__(_) do

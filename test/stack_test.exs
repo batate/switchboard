@@ -1,5 +1,6 @@
 defmodule StackTest do
   use ExUnit.Case
+  import Should
   require Switchboard
 
 
@@ -16,11 +17,11 @@ defmodule StackTest do
   
   def stack_with_module, do: Switchboard.Stack.Entity.new module: FunctionHandlerTest, plugs: []
 
-  test "should access parent's handlers" do
+  should "access parent's handlers" do
     assert Switchboard.Stack.handler(child_stack, :inc) == handler
   end
   
-  test "should invoke function handler" do
+  should "invoke function handler" do
     assert stack_with_module.module == FunctionHandlerTest
     assert Switchboard.Stack.handle( stack_with_module, :test, 1) == {:ok, "success"}
   end
