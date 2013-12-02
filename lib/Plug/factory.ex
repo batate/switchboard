@@ -43,11 +43,12 @@ defmodule Switchboard.Plug.Factory do
     Switchboard.Plug.new_from_mod_fun func: function, module: module
   end
 
+  # TODO: Should we allow the user to use a symbol in the handler chain?
   # set the parent in the new stack for modules (to maintain the context)
-  defp create_from_atom(plug_spec, module, opts, parent) do
+  defp create_from_atom(plug_spec, module, opts, parent_chain) do
     case is_elixir_module(plug_spec) do
-      true -> Switchboard.Plug.new_from_module module: plug_spec, options: opts, parent: parent 
-      false -> Switchboard.Plug.new_from_handler handler_name: plug_spec, module: module, parent: parent
+      true -> Switchboard.Plug.new_from_module module: plug_spec, options: opts, parent_chain: parent_chain
+      false -> Switchboard.Plug.new_from_handler handler_name: plug_spec, module: module, parent_chain: parent_chain
     end
   end
   

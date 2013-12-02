@@ -46,6 +46,24 @@ defmodule Switchboard.Stack do
   end
   
   @doc """
+  Switchboard maintains a parent chain as plugs are built, so that 
+  all handlers from your parent chain can be reached. 
+  
+  - :halt and :ok will just pass through, 
+  - :other will try to look at the stack's module for a function named other/2 and invoke it
+  - failing that, will try to invoke the handler on the stack with that name
+  - failing that, will move to the parent and go through the same process
+  - if no handler is found on the parents, will raise an exception
+  
+  """
+  def parent(nil), do: nil
+  def parent(stack) do
+    [parent_module|parent_chain] = stack.parent_chain
+    parent_module.stack(parent_chain)
+  end
+  
+  
+  @doc """
   process a handle with the given code. 
   
   - :halt and :ok will just pass through, 
@@ -71,10 +89,8 @@ defmodule Switchboard.Stack do
   defp _handle(code, context, nil), do: (raise "Unsupported handler: #{code}")
   defp _handle(code, context, stack), do: call( stack, context)
   
-  
-  
   def handler(nil, key), do: nil
-  def handler(stack, key), do: (stack.handlers[key] || handler(stack.parent, key))
+  def handler(stack, key), do: (stack.handlers[key] || handler(parent( stack ), key))
   
   def ensure(stack, context), do: handle_if(stack, context, :ensure)
   

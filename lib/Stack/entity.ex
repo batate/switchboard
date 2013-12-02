@@ -3,7 +3,7 @@ defrecord Switchboard.Stack.Entity,
   plugs: [], 
   handlers: [], 
   strategy: Switchboard.Strategy.ForwardOther,
-  parent: nil,
+  parent_chain: [],
   module: nil, 
   meta: Keyword.new do
     @type name              :: atom

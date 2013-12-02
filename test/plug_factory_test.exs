@@ -6,11 +6,11 @@ defmodule PlugFactoryTest do
   def inc(int, _), do: {:ok, int + 1}
 
   defmodule Double do
-    def stack(parent // nil) do
+    def stack(parent_chain // []) do
       Switchboard.Stack.Entity.new plugs: [
         Switchboard.Plug.Factory.build_plug( __MODULE__, {PlugFactoryTest, :inc}, []), 
         Switchboard.Plug.Factory.build_plug( __MODULE__, {PlugFactoryTest, :inc}, []) ], 
-                                   parent: parent
+                                   parent_chain: parent_chain
     end
     
     def inc(context, _), do: {:ok, context + 1}

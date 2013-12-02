@@ -1,12 +1,14 @@
-# Replace handler with name/value pairs. That's all that's needed 
+# handlers: stacks to modules
+# call_chain: [calling_module|call_chain]
 # handler chain gets rolled up with build step. 
-# Parents can fall out. Ensure chain can be called after initial stack. 
+# parents are chains of stacks (modules). 
+
 # Build-chain:
 #   Build out plugs as you go
 #   Replace plug macro with stack macro
 #   Each build traverses its plug chain, instantiating its plugs
 # 
-# TODO This 
+
  
 defmodule Switchboard.PlugBuilder do
   defmacro __using__(_) do
@@ -16,7 +18,6 @@ defmodule Switchboard.PlugBuilder do
       @plugs []
       @strategy Switchboard.Strategy.ForwardOther
       @handlers []
-      @parent nil
       @before_compile Switchboard.PlugBuilder
     end
   end
@@ -42,17 +43,17 @@ defmodule Switchboard.PlugBuilder do
     handler_list = Module.get_attribute(env.module, :handlers)
     strat = Module.get_attribute(env.module, :strategy)
     quote do
-      def plugs(parent // nil) do 
-        Enum.map unquote( plug_list ), &(Switchboard.Plug.Factory.build_plug(&1, parent))
+      def plugs(parent_chain // []) do 
+        Enum.map unquote( plug_list ), &(Switchboard.Plug.Factory.build_plug(&1, parent_chain))
       end
       
-      def stack(parent // nil) do
+      def stack(parent_chain // []) do
         Switchboard.Stack.Entity.new(
-          plugs: plugs(parent), 
+          plugs: plugs(parent_chain), 
           module: __MODULE__, 
           handlers: handlers, 
           strategy: unquote(strat), 
-          parent: parent )
+          parent_chain: parent_chain )
       end
       
       def handlers do
