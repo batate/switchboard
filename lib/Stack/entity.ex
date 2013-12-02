@@ -4,8 +4,7 @@ defrecord Switchboard.Stack.Entity,
   handlers: [], 
   strategy: Switchboard.Strategy.ForwardOther,
   parent_chain: [],
-  module: nil, 
-  meta: Keyword.new do
+  module: nil do
     @type name              :: atom
     @type plugs             :: [ Switchboard.Plug ]
     @type handlers          :: [ {atom, Switchboard.stack} ]

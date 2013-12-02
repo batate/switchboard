@@ -51,6 +51,7 @@ defmodule Switchboard.PlugBuilder do
         Switchboard.Stack.Entity.new(
           plugs: plugs(parent_chain), 
           module: __MODULE__, 
+          name: "#{__MODULE__}",
           handlers: handlers, 
           strategy: unquote(strat), 
           parent_chain: parent_chain )

@@ -10,7 +10,7 @@ defmodule ForwardOtherStrategyTest do
   def simple_plug, do: Switchboard.Plug.new_from_mod_fun func: :inc, module: __MODULE__
   def double_plug, do: Switchboard.Plug.new_from_mod_fun func: :double, module: __MODULE__
   def halt_plug, do: Switchboard.Plug.new_from_mod_fun func: :halt, module: __MODULE__
-  def stack, do: Switchboard.Stack.Entity.new plugs: [simple_plug, double_plug, double_plug], name: :stack
+  def stack(_ // []), do: Switchboard.Stack.Entity.new plugs: [simple_plug, double_plug, double_plug], name: :stack
   def halt_stack, do: Switchboard.Stack.Entity.new plugs: [simple_plug, halt_plug, double_plug], name: :halt_stack
   def handler, do: Switchboard.Stack.Entity.new plugs: [double_plug], name: :double_stack
   def stack_with_handler do
@@ -20,7 +20,7 @@ defmodule ForwardOtherStrategyTest do
   defmodule WithPlugs do
     def simple_plug, do: Switchboard.Plug.new_from_mod_fun func: :inc, module: ForwardOtherStrategyTest
     def double_plug, do: Switchboard.Plug.new_from_mod_fun func: :double, module: ForwardOtherStrategyTest
-    def stack, do: Switchboard.Stack.Entity.new plugs: [simple_plug, double_plug]
+    def stack(_ // []), do: Switchboard.Stack.Entity.new plugs: [simple_plug, double_plug]
   end
   
   def module_plug, do: Switchboard.Plug.new_from_module(module: WithPlugs)

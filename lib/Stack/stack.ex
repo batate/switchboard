@@ -57,10 +57,9 @@ defmodule Switchboard.Stack do
   
   """
   def parent(nil), do: nil
-  def parent(stack) do
-    [parent_module|parent_chain] = stack.parent_chain
-    parent_module.stack(parent_chain)
-  end
+  def parent(stack), do:  _parent stack.parent_chain
+  def _parent([]), do: nil
+  def _parent([parent_module|parent_chain]), do: parent_module.stack(parent_chain)
   
   
   @doc """

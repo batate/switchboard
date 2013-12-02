@@ -47,8 +47,10 @@ defmodule Switchboard.Plug.Factory do
   # set the parent in the new stack for modules (to maintain the context)
   defp create_from_atom(plug_spec, module, opts, parent_chain) do
     case is_elixir_module(plug_spec) do
-      true -> Switchboard.Plug.new_from_module module: plug_spec, options: opts, parent_chain: parent_chain
-      false -> Switchboard.Plug.new_from_handler handler_name: plug_spec, module: module, parent_chain: parent_chain
+      true -> Switchboard.Plug.new_from_module module: plug_spec, options: opts, parent_chain: [module|parent_chain]
+      false -> Switchboard.Plug.new_from_handler handler_name: plug_spec, 
+                                                 module: module, 
+                                                 parent_chain: [module|parent_chain]
     end
   end
   

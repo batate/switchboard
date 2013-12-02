@@ -23,7 +23,7 @@ defmodule Switchboard.Plug do
     module = opts[:module]
     if nil?( module ), do: no_module
 
-    stack = module.stack(opts[:parent])
+    stack = module.stack(opts[:parent_chain])
     handler_name = opts[:handler_name]
     if nil?( handler_name), do: no_handler
 
@@ -38,7 +38,7 @@ defmodule Switchboard.Plug do
   def invoke_from_module_plug(context, opts) do
     module = opts[:module]
     options = opts[:options] || Keyword.new
-    Switchboard.Stack.call module.stack, context
+    Switchboard.Stack.call module.stack(opts[:parent_chain]), context
   end
   
   

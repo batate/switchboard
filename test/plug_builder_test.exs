@@ -2,7 +2,6 @@
 defmodule PlugBuilderTest do
   use ExUnit.Case
   import Should
-  require Switchboard
 
 
   defmodule Triple do
@@ -20,13 +19,13 @@ defmodule PlugBuilderTest do
     plug :clear
     plug {TestBoard, :inc}
     plug :double
-
+  
     on :triple_it, Triple
     
     def inc(context, _), do: {:ok, context + 1}
     def double(context, _), do: {:ok, context * 2}
     def clear(_, _), do: {:ok, 0}
-
+  
   end
   
   should "define plugs" do
@@ -45,5 +44,33 @@ defmodule PlugBuilderTest do
     
   should "define a handler", do:
     assert Enum.count(TestBoard.stack.handlers) == 1
+    
+  # ---------------------------------------------------
+  # tests to check parent assignment and handler access
+  # ---------------------------------------------------
+
+  defmodule MarkMe do
+    use Switchboard.PlugBuilder
+
+    plug :mark_it
+    
+    def mark_it(_, _), do: {:ok, :marked}
+  end
+
+  defmodule Parent do
+    use Switchboard.PlugBuilder
+    plug PlugBuilderTest.Child
+    
+    on :mark, MarkMe
+  end  
   
+  defmodule Child do
+    use Switchboard.PlugBuilder
+    plug :handle_mark
+    
+    def handle_mark(context, _), do: {:mark, context}
+  end
+  
+  should "navigate parent chain", do:
+    assert Switchboard.Stack.call( Parent.stack, "") == {:halt, :marked}
 end
