@@ -6,6 +6,7 @@ defmodule FilterBuilderTest do
     use Switchboard.FilterBuilder
     
     filter :mark, {:only, [:show]}
+    dispatch
     
     def show(context), do: {:ok, context.assign(:show, "invoked")}
     

@@ -50,16 +50,18 @@ defmodule Switchboard.FilterBuilder do
   # TODO make this implicit
   defmacro dispatch do
     quote do
-      plug = {Switchboard.Plug.Dispatcher, :dispatch}
-      opts = Module.get_attribute(__MODULE__, :dispatch_options)
-
-      @plugs [[ :custom, {Switchboard.FilterBuilder, :build_filter}, plug ]|@plugs]
+      opts = Module.get_attribute(__MODULE__, :dispatch_options) |> Keyword.put( :controller, __MODULE__ )
+      
+      @plugs [Switchboard.PlugBuilder.custom_plug(&Switchboard.FilterBuilder.build_dispatcher/2, [opts])|@plugs]
     end
   end
   
   def build_filter([filter_spec, membership, opts], _) do
     Switchboard.Scheme.Filter.new_filter(filter_spec, membership, opts)
   end
+  
+  def build_dispatcher([opts], _), do: Switchboard.Scheme.Filter.new_dispatcher(opts)
+  
   
   defmacro filter_options(opts // []) do 
     quote do
