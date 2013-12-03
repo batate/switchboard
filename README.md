@@ -30,7 +30,50 @@ But the chaining of plugs often needs to halt in the middle for many reasons.
 
 In practice, we may want to compose different stacks of plugs in different ways. 
 
-Enter Switchboard. 
+Enter Switchboard
+
+You might not see the need for Switchboard for a simple app. I agree with you. When Elixir is enough, use it. In truth, most complex applications need to do some common plumbing. Switchboard:
+
+## Common DSLs
+
+- Provides simple DSLs that solve the types of problems you see over and over
+
+```elixir
+defmodule Application do
+  plug Request
+  plug Router
+  plug Renderer
+
+  on :authenticate, Vendor.Authenticate
+  on :error, Notify
+end
+
+defmodule Request do
+  plug ParseParams
+  plug EnforseSSL
+  ...
+end
+
+defmodule Notify do
+  :notify_admins, ["admin1@example.com", ...]
+  :log_error, [System.Logger.Error]
+  
+  def notify_admins(context, []), do: something
+  def notify_admins(context, []), do: something_else
+end
+```
+
+```elixir
+```
+
+```elixir
+```
+
+- Allows you to buid groups of plugs, called stacks
+- Enforces a common API so that functions can easily be composed
+- Provides some simple strategies so you can compose 
+
+Write your functions in Elixir. Test them as units. Build them to conform to a common specification. Then wire them up using a DSL. 
 
 
 
