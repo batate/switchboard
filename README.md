@@ -39,7 +39,28 @@ You might not see the need for Switchboard for a simple app. I agree with you. W
 - Provides simple DSLs that solve the types of problems you see over and over
 
 ```elixir
+defmodule Request do
+  ...
+  plug ParseParams
+  plug EnforseSSL
+  ...
+end
+
+defmodule Notify do
+  ...
+  plug :notify_admins, ["admin1@example.com", ...]
+  plug :log_error, [System.Logger.Error]
+  
+  def notify_admins(context, []), do: something
+  def notify_admins(context, []), do: something_else
+end
+```
+
+Switchboard makes it easy to compose groups of plugs, called stacks:
+
+```elixir
 defmodule Application do
+  ...
   plug Request
   plug Router
   plug Renderer
@@ -47,33 +68,36 @@ defmodule Application do
   on :authenticate, Vendor.Authenticate
   on :error, Notify
 end
+```
 
-defmodule Request do
-  plug ParseParams
-  plug EnforseSSL
+Switchboard supports multiple DSLs for different goals:
+
+```elixir
+defmodule OldSchoolController do
   ...
-end
-
-defmodule Notify do
-  :notify_admins, ["admin1@example.com", ...]
-  :log_error, [System.Logger.Error]
+  filter :find_student, only: [members]
+  filter :find_students, only: [connection]
+  filter :authentication_required # defined in an on-block on a common parent
+  dispatch
+  ensure :clear_cache, only: [:delete, :update, :create]
   
-  def notify_admins(context, []), do: something
-  def notify_admins(context, []), do: something_else
+  def show(context), do: ...
 end
 ```
 
-```elixir
-```
+Switchboard also supports different strategies. This strategy will halt as soon as a :halt return code is encountered. 
 
 ```elixir
+defmodule SomethingDangerous do
+  strategy Switchboard.Strategy.Halt
+  plug :something_safe
+  plug :something_dangerous
+end
 ```
 
-- Allows you to buid groups of plugs, called stacks
-- Enforces a common API so that functions can easily be composed
-- Provides some simple strategies so you can compose 
+In short, Switchboard allows you to compose plugs in the right language for the job, and then roll up your applications with common code and DSLs that handle the integration glue for you.  Write your functions in Elixir. Test them as units. Build them to conform to a common specification. Then wire them up using a DSL. 
 
-Write your functions in Elixir. Test them as units. Build them to conform to a common specification. Then wire them up using a DSL. 
+It just makes sense. 
 
 
 
