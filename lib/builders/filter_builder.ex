@@ -26,7 +26,11 @@ defmodule Switchboard.FilterBuilder do
     
     opts = Module.get_attribute(__MODULE__, :filter_options)
     quote do
-      @plugs [ [:filter, __MODULE__, unquote(plug_spec), unquote(opts)] |@plugs]
+      @plugs [ :custom, FilterBuilder, [ module: __MODULE__, 
+                                         plug_spec: unquote(plug_spec), 
+                                         action: unquote(action),
+                                         membership: unquote(membership), 
+                                         options: unquote(opts)] |@plugs]
     end
   end
   
