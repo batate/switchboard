@@ -52,9 +52,9 @@ defrecord Switchboard.Scheme.Filter,
   
   
   """
-  def new_filter(scheme, plug, membership) do
+  def new_filter(plug, membership, options) do
     Switchboard.Plug.IfPlug.new( plug, 
-                                 scheme.action_function, 
+                                 options[:action_function], 
                                  &Switchboard.Scheme.Filter.member?/2, 
                                  membership )
   end
@@ -81,17 +81,13 @@ defrecord Switchboard.Scheme.Filter,
   
   
   """
-  def new_dispatcher(scheme) do
+  def new_dispatcher(opts) do
     Switchboard.Plug.new_from_mod_fun func: :dispatch, 
                              module: Switchboard.Plug.Dispatcher, 
-                             options: [controller: scheme.controller, 
-                                       action_fun: scheme.action_function, 
-                                       args_fun: scheme.args_function || (fn(_) -> [] end) ]
+                             options: [controller: opts[:controller], 
+                                       action_fun: opts[:action_function], 
+                                       args_fun: opts[:args_function] || (fn(_) -> [] end) ]
   end
-
-
-  
-  
 
   @doc """
   Test whether an action satisfies the criteria in membership. 
@@ -110,7 +106,3 @@ defrecord Switchboard.Scheme.Filter,
   
 end
 
-defrecord Switchboard.Scheme.Filter.Entity, 
-  controller: nil, 
-  action_function: nil, 
-  args_function: nil

@@ -1,14 +1,6 @@
-# handlers: stacks to modules
-# call_chain: [calling_module|call_chain]
-# handler chain gets rolled up with build step. 
-# parents are chains of stacks (modules). 
-
-# Build-chain:
-#   Build out plugs as you go
-#   Replace plug macro with stack macro
-#   Each build traverses its plug chain, instantiating its plugs
-# 
-
+# now, the handlers are inefficient... they build our their plug chains dynamically rather than once. 
+# a handler should be built intact and passed up through the chain, 
+# just as parents are. 
  
 defmodule Switchboard.PlugBuilder do
   defmacro __using__(_) do
@@ -33,6 +25,12 @@ defmodule Switchboard.PlugBuilder do
       @handlers [ [unquote(name), unquote(module)] | @handlers ]
     end
   end
+  
+  defmacro scheme(s) do
+    quote do
+      @scheme s.update( module: __MODULE__ )
+    end
+  end
 
   defmacro strategy(s) do
     quote do: @strategy unquote(s)
@@ -42,6 +40,7 @@ defmodule Switchboard.PlugBuilder do
     plug_list = Enum.reverse Module.get_attribute(env.module, :plugs)
     handler_list = Module.get_attribute(env.module, :handlers)
     strat = Module.get_attribute(env.module, :strategy)
+    scheme = [Module.get_attribute(env.module, :scheme)]
     quote do
       def plugs(parent_chain // []) do 
         Enum.map unquote( plug_list ), &(Switchboard.Plug.Factory.build_plug(&1, parent_chain))
@@ -60,6 +59,7 @@ defmodule Switchboard.PlugBuilder do
       def handlers do
         Enum.map unquote( handler_list ), &(Switchboard.Stack.build_handler/1)
       end
+      
     end
   end
   

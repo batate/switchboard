@@ -12,15 +12,14 @@ defmodule FilterStrategyTest do
   end
 
   def scheme do 
-    Switchboard.Scheme.Filter.Entity.new controller: Controller, 
-                                    action_function: &(Switchboard.Context.get(:action, &1)) 
+    [controller: Controller, action_function: &(Switchboard.Context.get(:action, &1))]
   end
   
   def strategy, do: Switchboard.Strategy.Halt
   
 
   def plug, do: Switchboard.Plug.new_from_anon func: (fn(context, _) -> ({:ok, context.assign(:plug_invoked, "true")}) end)
-  def filter, do: Switchboard.Scheme.Filter.new_filter(scheme, plug, {:only, [:show]})
+  def filter, do: Switchboard.Scheme.Filter.new_filter(plug, {:only, [:show]}, scheme)
   def show_context, do: Switchboard.Context.new.assign(:action, :show)
   def index_context, do: Switchboard.Context.new.assign(:action, :index)
   def dispatch, do: Switchboard.Scheme.Filter.new_dispatcher scheme
@@ -44,9 +43,10 @@ defmodule FilterStrategyTest do
   #   assert context.assigns[:invoke] == :index
   # end
   # 
-  should "invoke ensure" do
+  should "invoke ensure and index" do
     {_, context} = Switchboard.Stack.call(stack, index_context)
     assert context.assigns[:ensure] == true
+    assert context.assigns[:invoke] == :index
   end
   
 end
