@@ -26,12 +26,6 @@ defmodule Switchboard.PlugBuilder do
     end
   end
   
-  defmacro scheme(s) do
-    quote do
-      @scheme s.update( module: __MODULE__ )
-    end
-  end
-
   defmacro strategy(s) do
     quote do: @strategy unquote(s)
   end
@@ -40,10 +34,9 @@ defmodule Switchboard.PlugBuilder do
     plug_list = Enum.reverse Module.get_attribute(env.module, :plugs)
     handler_list = Module.get_attribute(env.module, :handlers)
     strat = Module.get_attribute(env.module, :strategy)
-    scheme = [Module.get_attribute(env.module, :scheme)]
     quote do
       def plugs(parent_chain // []) do 
-        Enum.map unquote( plug_list ), &(Switchboard.Plug.Factory.build_plug(&1, parent_chain))
+        Enum.map unquote( plug_list ), &(Switchboard.PlugBuilder.build_plug(&1, parent_chain))
       end
       
       def stack(parent_chain // []) do
@@ -62,5 +55,16 @@ defmodule Switchboard.PlugBuilder do
       
     end
   end
+  
+  def custom_plug(build_fun, plug_spec) do
+    [ :custom, build_fun, plug_spec ]
+  end
+  
+  def build_plug([:custom, build_fun, plug], parent_chain) do
+    build_fun.(plug, parent_chain)
+  end
+  
+  def build_plug(p, parent_chain), do: Switchboard.Plug.Factory.build_plug(p, parent_chain)
+  
   
 end

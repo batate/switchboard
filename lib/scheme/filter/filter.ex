@@ -52,8 +52,8 @@ defrecord Switchboard.Scheme.Filter,
   
   
   """
-  def new_filter(plug, membership, options) do
-    Switchboard.Plug.IfPlug.new( plug, 
+  def new_filter(plug_spec, membership, options) do
+    Switchboard.Plug.IfPlug.new( plug_spec, 
                                  options[:action_function], 
                                  &Switchboard.Scheme.Filter.member?/2, 
                                  membership )
