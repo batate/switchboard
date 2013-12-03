@@ -18,5 +18,9 @@ defmodule FilterBuilderTest do
     plugs = Filters.plugs([])
     IO.puts "Plugs: #{inspect plugs}"
   end
+  
+  should "execute plugs" do
+    Filters.stack
+  end
 
 end
