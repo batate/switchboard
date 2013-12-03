@@ -8,7 +8,8 @@ defmodule FilterBuilderTest do
     filter :mark, {:only, [:show]}
     dispatch
     
-    def show(context), do: {:ok, context.assign(:show, "invoked")}
+    def show(context, _), do: {:ok, context.assign(:show, "invoked")}
+    def mark(context, _), do: {:ok, context.assign(:marked, "true")}
     
   end
   
@@ -16,11 +17,13 @@ defmodule FilterBuilderTest do
   
   should "render plugs" do
     plugs = Filters.plugs([])
-    IO.puts "Plugs: #{inspect plugs}"
   end
   
   should "execute plugs" do
-    Filters.stack
+    context = Switchboard.Context.new( assigns: [action: :show])
+    {_, context} = Switchboard.Stack.call Filters.stack, context
+    assert Switchboard.Context.get( :marked, context ) == "true"
+    assert Switchboard.Context.get( :show, context ) == "invoked"
   end
 
 end

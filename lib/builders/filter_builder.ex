@@ -13,10 +13,10 @@ defmodule Switchboard.FilterBuilder do
       
       # begin filter module attributes
       
-      @filter_options [ action_function: &Switchboard.FilterBuilder.action_function/2, 
+      @filter_options [ action_function: &Switchboard.FilterBuilder.action_function/1, 
                         membership_function: &Switchboard.Scheme.Filter.member?/2 ]
-      @dispatch_options [ action_fun: &Switchboard.FilterBuilder.action_function/1, 
-                          args_fun: &Switchboard.FilterBuilder.args_function/1 ]
+      @dispatch_options [ action_function: &Switchboard.FilterBuilder.action_function/1, 
+                          args_function: &Switchboard.FilterBuilder.args_function/1 ]
     end
   end
   
@@ -33,11 +33,11 @@ defmodule Switchboard.FilterBuilder do
   defmacro filter(plug_spec, membership) do
     quote do
       opts = Module.get_attribute(__MODULE__, :filter_options)
-      IO.puts inspect(opts)
-      IO.puts inspect(unquote membership)
       filter_spec = [ unquote(plug_spec), unquote(membership), opts]
 
-      @plugs [Switchboard.PlugBuilder.custom_plug(&Switchboard.FilterBuilder.build_filter/2, filter_spec)|@plugs]
+      @plugs [Switchboard.PlugBuilder.custom_plug(__MODULE__, 
+                                                  &Switchboard.FilterBuilder.build_filter/3, 
+                                                  filter_spec)|@plugs]
     end
   end
 
@@ -52,15 +52,18 @@ defmodule Switchboard.FilterBuilder do
     quote do
       opts = Module.get_attribute(__MODULE__, :dispatch_options) |> Keyword.put( :controller, __MODULE__ )
       
-      @plugs [Switchboard.PlugBuilder.custom_plug(&Switchboard.FilterBuilder.build_dispatcher/2, [opts])|@plugs]
+      @plugs [Switchboard.PlugBuilder.custom_plug(__MODULE__, 
+                                                  &Switchboard.FilterBuilder.build_dispatcher/3, 
+                                                  [opts])|@plugs]
     end
   end
   
-  def build_filter([filter_spec, membership, opts], _) do
-    Switchboard.Scheme.Filter.new_filter(filter_spec, membership, opts)
+  def build_filter([filter_spec, membership, opts], module, parent_chain) do
+    plug = Switchboard.Plug.Factory.build_plug(module, filter_spec, opts, parent_chain)
+    Switchboard.Scheme.Filter.new_filter(plug, membership, opts)
   end
   
-  def build_dispatcher([opts], _), do: Switchboard.Scheme.Filter.new_dispatcher(opts)
+  def build_dispatcher([opts], _, _), do: Switchboard.Scheme.Filter.new_dispatcher(opts)
   
   
   defmacro filter_options(opts // []) do 

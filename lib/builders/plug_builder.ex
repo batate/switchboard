@@ -56,12 +56,12 @@ defmodule Switchboard.PlugBuilder do
     end
   end
   
-  def custom_plug(build_fun, plug_spec) do
-    [ :custom, build_fun, plug_spec ]
+  def custom_plug(module, build_fun, plug_spec) do
+    [ :custom, build_fun, module, plug_spec ]
   end
   
-  def build_plug([:custom, build_fun, plug], parent_chain) do
-    build_fun.(plug, parent_chain)
+  def build_plug([:custom, build_fun, module, plug], parent_chain) do
+    build_fun.(plug, module, parent_chain)
   end
   
   def build_plug(p, parent_chain), do: Switchboard.Plug.Factory.build_plug(p, parent_chain)
