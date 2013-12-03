@@ -26,23 +26,23 @@ defmodule FilterStrategyTest do
   
   def stack, do: Switchboard.Stack.Entity.new plugs: [filter, dispatch], strategy: strategy, module: Controller
   
-  # should "invoke plug", do: plug.(show_context)
-  # 
-  # should "invoke before filter" do
-  #   {_, context} = Switchboard.Stack.call(stack, show_context)
-  #   assert "true" == context.assigns[:plug_invoked]
-  # end
-  # 
-  # should "not before filter" do
-  #   {_, context} = Switchboard.Stack.call(stack, index_context)
-  #   assert nil == context.assigns[:plug_invoked]
-  # end
-  # 
-  # should "dispatch" do
-  #   {_, context} = Switchboard.Stack.call(stack, index_context)
-  #   assert context.assigns[:invoke] == :index
-  # end
-  # 
+  should "invoke plug", do: plug.(show_context)
+  
+  should "invoke before filter" do
+    {_, context} = Switchboard.Stack.call(stack, show_context)
+    assert "true" == context.assigns[:plug_invoked]
+  end
+  
+  should "not before filter" do
+    {_, context} = Switchboard.Stack.call(stack, index_context)
+    assert nil == context.assigns[:plug_invoked]
+  end
+  
+  should "dispatch" do
+    {_, context} = Switchboard.Stack.call(stack, index_context)
+    assert context.assigns[:invoke] == :index
+  end
+  
   should "invoke ensure and index" do
     {_, context} = Switchboard.Stack.call(stack, index_context)
     assert context.assigns[:ensure] == true
