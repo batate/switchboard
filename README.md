@@ -1,6 +1,13 @@
 # Switchboard
 
-Welcome to Switchboard, a framework for composing Elixir applications in a uniform way. Any two Elixir functions that conform to the Plug API can be connected through Switchboard. 
+Welcome to Switchboard, a thought experiment on what it means to separate these concerns: 
+
+- function composition
+- strategy for composition
+- rigid interface (f(context, options) -> {:code, transformed_context}
+- dsls for doing the above
+
+In the end, I want to determine whether it makes sense to provide an abstraction on top of base Elixir concepts in a simple, performant, flexible way. 
 
 ## Plugs
 
@@ -95,10 +102,13 @@ defmodule SomethingDangerous do
 end
 ```
 
-In short, Switchboard allows you to compose plugs in the right language for the job, and then roll up your applications with common code and DSLs that handle the integration glue for you.  Write your functions in Elixir. Test them as units. Build them to conform to a common specification. Then wire them up using a DSL. 
+In short, Switchboard allows you to write functions and then script them to glue them together using a higher level DSL.
 
-It just makes sense. 
+## Core questions
 
+- Will this framework hide important details, or can it be relatively clear?
+- Is it possible to split the abstractions at the key places, without unnecessary coupling?
+- In short, does the framework provide enough value over native elixir to be worth what is lost?
 
 
 
